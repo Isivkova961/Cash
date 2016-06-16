@@ -1,0 +1,46 @@
+unit CashDM;
+
+interface
+
+uses
+  SysUtils, Classes, DB, ADODB;
+
+type
+  TdmCash = class(TDataModule)
+    adocCash: TADOConnection;
+    adoqReal: TADOQuery;
+    dsReal: TDataSource;
+    adoqVirtual: TADOQuery;
+    dsVirtual: TDataSource;
+    adoqData: TADOQuery;
+    dsData: TDataSource;
+    adoqSprav: TADOQuery;
+    dsSprav: TDataSource;
+    adoqDetail: TADOQuery;
+    dsDetail: TDataSource;
+    adoqSumDate: TADOQuery;
+    dsSumDate: TDataSource;
+    adoqDrevo: TADOQuery;
+    dsDrevo: TDataSource;
+    adoqSumRV: TADOQuery;
+    dsSumRV: TDataSource;
+    adoqDrevo1: TADOQuery;
+    dsDrevo1: TDataSource;
+    adoqDohod: TADOQuery;
+    dsDohod: TDataSource;
+    adoqRashod: TADOQuery;
+    dsRashod: TDataSource;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dmCash: TdmCash;
+
+implementation
+
+{$R *.dfm}
+
+end.
