@@ -1,9 +1,9 @@
 object dmCash: TdmCash
   OldCreateOrder = False
-  Left = 487
-  Top = 324
+  Left = 597
+  Top = 211
   Height = 329
-  Width = 436
+  Width = 460
   object adocCash: TADOConnection
     Connected = True
     ConnectionString = 
@@ -111,5 +111,34 @@ object dmCash: TdmCash
     Parameters = <>
     Left = 256
     Top = 200
+  end
+  object adoqSpisok: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 328
+    Top = 152
+  end
+  object adoqStatus: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 328
+    Top = 200
+  end
+  object adoqSpravoch: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 328
+    Top = 40
+  end
+  object dsStatus: TDataSource
+    DataSet = adoqStatus
+    Left = 376
+    Top = 200
+  end
+  object adoqDetail1: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 176
+    Top = 40
   end
 end

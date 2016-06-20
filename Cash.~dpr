@@ -12,6 +12,7 @@ uses
 
 begin
   Application.Initialize;
+  Application.Title := 'Cash 1.0';
   Application.CreateForm(TfMainCash, fMainCash);
   Application.CreateForm(TfSprav, fSprav);
   Application.CreateForm(TfCashDetail, fCashDetail);

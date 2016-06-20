@@ -45,6 +45,7 @@ type
     nDelete: TMenuItem;
     sgData: TStringGrid;
     dbgVirtual: TDBGridEh;
+    nStatus: TMenuItem;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: WideString);
@@ -82,11 +83,13 @@ type
     procedure dbgVirtualDblClick(Sender: TObject);
     procedure sbSpravClick(Sender: TObject);
     procedure spGodChange(Sender: TObject);
+    procedure nStatusClick(Sender: TObject);
   private
     { Private declarations }
   public
     bReal_Virt,bNew_Edit: boolean;
     Date_data: string;
+    id_prod: array [1..2] of TStringList;
     { Public declarations }
   end;
   
@@ -104,11 +107,11 @@ type
 var
   fMainCash: TfMainCash;
   RowCel: integer;
-  id_prod: array [1..2] of TStringList;
+
 
 implementation
 
-uses CashDM, CashDetail, SpravPokup;
+uses CashDM, CashDetail, SpravPokup, SpisokPokup, CashStatus;
 
 {$R *.dfm}
 
@@ -163,9 +166,13 @@ begin
 end;
 
 procedure TfMainCash.FormCreate(Sender: TObject);
+var
+  i: integer;
 begin
   //выделение памяти под структуру
   vtW.NodeDataSize := SizeOf(RvtWinfo);
+  for i := 1 to 2 do
+    id_prod[i] := TStringList.Create;
 end;
 
 //создание дерева
@@ -581,7 +588,7 @@ begin
     sgData.RowHeights[i] := 19;
   //Изменение размеров столбцов dbgReal в зависимости от размеров самого dbgReal
   for i := 0 to dbgReal.Columns.Count - 1 do
-    dbgReal.Columns[i].Width := round(dbgReal.Width / dbgReal.Columns.Count) - 6;
+    dbgReal.Columns[i].Width := round(dbgReal.Width / dbgReal.Columns.Count) - 2;
   //Изменение размеров столбцов dbgVirtual в зависимости от размеров самого dbgVirtual
   for i := 0 to dbgVirtual.Columns.Count - 1 do
     dbgVirtual.Columns[i].Width := round(dbgVirtual.Width / dbgVirtual.Columns.Count) - 6;
@@ -779,22 +786,31 @@ begin
 end;
 
 procedure TfMainCash.DeleteRow;
+var
+  iid: integer;
 begin
   with dmCash do
     begin
       if bReal_Virt = true then
         begin
+          iid := adoqReal.FieldByName('id').Value;
           adoqDetail.SQL.Clear;
           adoqDetail.SQL.Append('DELETE FROM real_pokup');
-          adoqDetail.SQL.Append('WHERE id=:iid');
-          adoqDetail.Parameters.ParamByName('iid').Value := adoqReal.FieldByName('id').Value;
+          adoqDetail.SQL.Append('WHERE id = :iid');
+          adoqDetail.Parameters.ParamByName('iid').Value := iid;
+          adoqDetail.ExecSQL;
+
+          adoqDetail.SQL.Clear;
+          adoqDetail.SQL.Append('DELETE FROM status_pokup');
+          adoqDetail.SQL.Append('WHERE id_pokup = :iid');
+          adoqDetail.Parameters.ParamByName('iid').Value := iid;
           adoqDetail.ExecSQL;
         end
       else
         begin
           adoqDetail.SQL.Clear;
           adoqDetail.SQL.Append('DELETE FROM virtual_pokup');
-          adoqDetail.SQL.Append('WHERE id=:iid');
+          adoqDetail.SQL.Append('WHERE id = :iid');
           adoqDetail.Parameters.ParamByName('iid').Value := adoqVirtual.FieldByName('id').Value;
           adoqDetail.ExecSQL;
         end;
@@ -831,9 +847,6 @@ var
   i, j: integer;
   s, s1: string;
 begin
-  for i := 1 to 2 do
-    id_prod[i] := TStringList.Create;
-
   with dmCash do
     begin
       adoqDrevo.SQL.Text:='SELECT * FROM sprav_pokup';
@@ -916,6 +929,11 @@ begin
   sgData.Row := RowCel; //Номер выделенной строки
   ButEnabled;  //Активность кнопок редактирования и удаления
   SummaDate;   //Вывод сумм по расходам и прогнозам
+end;
+
+procedure TfMainCash.nStatusClick(Sender: TObject);
+begin
+  fStatus.ShowModal;
 end;
 
 end.

@@ -13,23 +13,19 @@ type
     adoqVirtual: TADOQuery;
     dsVirtual: TDataSource;
     adoqData: TADOQuery;
-    dsData: TDataSource;
     adoqSprav: TADOQuery;
-    dsSprav: TDataSource;
     adoqDetail: TADOQuery;
-    dsDetail: TDataSource;
     adoqSumDate: TADOQuery;
-    dsSumDate: TDataSource;
     adoqDrevo: TADOQuery;
-    dsDrevo: TDataSource;
     adoqSumRV: TADOQuery;
-    dsSumRV: TDataSource;
     adoqDrevo1: TADOQuery;
-    dsDrevo1: TDataSource;
     adoqDohod: TADOQuery;
-    dsDohod: TDataSource;
     adoqRashod: TADOQuery;
-    dsRashod: TDataSource;
+    adoqSpravData: TADOQuery;
+    adoqSpisok: TADOQuery;
+    adoqStatus: TADOQuery;
+    adoqSpravoch: TADOQuery;
+    dsStatus: TDataSource;
   private
     { Private declarations }
   public

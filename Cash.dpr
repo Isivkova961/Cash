@@ -6,7 +6,9 @@ uses
   SpravPokup in 'SpravPokup.pas' {fSprav},
   CashDM in 'CashDM.pas' {dmCash: TDataModule},
   CashDetail in 'CashDetail.pas' {fCashDetail},
-  SpravNE in 'SpravNE.pas' {fSpravNE};
+  SpravNE in 'SpravNE.pas' {fSpravNE},
+  SpisokPokup in 'SpisokPokup.pas' {fSpisokPokup},
+  CashStatus in 'CashStatus.pas' {fStatus};
 
 {$R *.res}
 
@@ -18,5 +20,7 @@ begin
   Application.CreateForm(TfCashDetail, fCashDetail);
   Application.CreateForm(TdmCash, dmCash);
   Application.CreateForm(TfSpravNE, fSpravNE);
+  Application.CreateForm(TfSpisokPokup, fSpisokPokup);
+  Application.CreateForm(TfStatus, fStatus);
   Application.Run;
 end.

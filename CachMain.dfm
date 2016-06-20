@@ -352,7 +352,7 @@ object fMainCash: TfMainCash
         Top = 20
         Width = 749
         Height = 167
-        ActivePage = tsVirtual
+        ActivePage = tsReal
         Align = alClient
         HotTrack = True
         TabOrder = 1
@@ -418,6 +418,23 @@ object fMainCash: TfMainCash
                 Title.Font.Name = 'Times New Roman'
                 Title.Font.Style = [fsBold]
                 Width = 183
+              end
+              item
+                EditButtons = <>
+                FieldName = 'kol'
+                Font.Charset = RUSSIAN_CHARSET
+                Font.Color = clBlack
+                Font.Height = -13
+                Font.Name = 'Times New Roman'
+                Font.Style = []
+                Footers = <>
+                Title.Alignment = taCenter
+                Title.Caption = #1050#1086#1083'-'#1074#1086
+                Title.Font.Charset = RUSSIAN_CHARSET
+                Title.Font.Color = clBlue
+                Title.Font.Height = -13
+                Title.Font.Name = 'Times New Roman'
+                Title.Font.Style = [fsBold]
               end
               item
                 EditButtons = <>
@@ -512,6 +529,18 @@ object fMainCash: TfMainCash
               end
               item
                 EditButtons = <>
+                FieldName = 'kol'
+                Footers = <>
+                Title.Alignment = taCenter
+                Title.Caption = #1050#1086#1083'-'#1074#1086
+                Title.Font.Charset = RUSSIAN_CHARSET
+                Title.Font.Color = clBlue
+                Title.Font.Height = -13
+                Title.Font.Name = 'Times New Roman'
+                Title.Font.Style = [fsBold]
+              end
+              item
+                EditButtons = <>
                 FieldName = 'koshel'
                 Footers = <>
                 Title.Alignment = taCenter
@@ -572,6 +601,10 @@ object fMainCash: TfMainCash
     Top = 432
     object nFile: TMenuItem
       Caption = #1060#1072#1081#1083
+    end
+    object nStatus: TMenuItem
+      Caption = #1055#1086#1082#1091#1087#1082#1080' '#1074' '#1085#1072#1083#1080#1095#1080#1080
+      OnClick = nStatusClick
     end
   end
   object ilCash: TImageList

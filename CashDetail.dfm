@@ -4,7 +4,7 @@ object fCashDetail: TfCashDetail
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = #1044#1077#1090#1072#1083#1080#1079#1072#1094#1080#1103
-  ClientHeight = 230
+  ClientHeight = 257
   ClientWidth = 363
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
@@ -50,17 +50,24 @@ object fCashDetail: TfCashDetail
     end
     object lKoshel: TLabel
       Left = 30
-      Top = 88
+      Top = 120
       Width = 55
       Height = 17
       Caption = #1050#1086#1096#1077#1083#1077#1082
     end
     object lKomment: TLabel
       Left = 30
-      Top = 120
+      Top = 152
       Width = 85
       Height = 17
       Caption = #1050#1086#1084#1084#1077#1085#1090#1072#1088#1080#1081
+    end
+    object lKol: TLabel
+      Left = 30
+      Top = 88
+      Width = 73
+      Height = 17
+      Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086
     end
     object deDate: TDateEdit
       Left = 72
@@ -89,7 +96,7 @@ object fCashDetail: TfCashDetail
     end
     object cobKoshel: TComboBox
       Left = 144
-      Top = 80
+      Top = 112
       Width = 185
       Height = 25
       ItemHeight = 17
@@ -97,14 +104,14 @@ object fCashDetail: TfCashDetail
     end
     object eKoment: TEdit
       Left = 144
-      Top = 112
+      Top = 144
       Width = 185
       Height = 25
       TabOrder = 3
     end
     object bOK: TButton
       Left = 80
-      Top = 160
+      Top = 184
       Width = 90
       Height = 30
       Caption = #1054#1050
@@ -119,7 +126,7 @@ object fCashDetail: TfCashDetail
     end
     object bCancel: TButton
       Left = 192
-      Top = 160
+      Top = 184
       Width = 90
       Height = 30
       Caption = #1054#1090#1084#1077#1085#1072
@@ -132,10 +139,17 @@ object fCashDetail: TfCashDetail
       TabOrder = 5
       OnClick = bCancelClick
     end
+    object eKol: TEdit
+      Left = 144
+      Top = 80
+      Width = 185
+      Height = 25
+      TabOrder = 7
+    end
   end
   object pDetail_but: TPanel
     Left = 0
-    Top = 198
+    Top = 225
     Width = 363
     Height = 32
     Align = alBottom

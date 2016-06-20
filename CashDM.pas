@@ -22,6 +22,11 @@ type
     adoqDohod: TADOQuery;
     adoqRashod: TADOQuery;
     adoqSpravData: TADOQuery;
+    adoqSpisok: TADOQuery;
+    adoqStatus: TADOQuery;
+    adoqSpravoch: TADOQuery;
+    dsStatus: TDataSource;
+    adoqDetail1: TADOQuery;
   private
     { Private declarations }
   public

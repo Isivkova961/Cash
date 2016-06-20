@@ -22,6 +22,8 @@ type
     bOK: TButton;
     bCancel: TButton;
     pDetail_but: TPanel;
+    lKol: TLabel;
+    eKol: TEdit;
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure LoadTable;
@@ -54,7 +56,7 @@ end;
 
 procedure TfCashDetail.LoadTable;
 var
-  d_r: string;
+  sign: string;
 begin
   cobKoshel.Clear;
   with  dmCash.adoqSprav do
@@ -78,20 +80,24 @@ begin
   with  dmCash.adoqSprav do
     begin
       SQL.Clear;
-      SQL.Text := 'SELECT * FROM sprav_pokup';
+      SQL.Append('SELECT * FROM sprav_pokup');
+      SQL.Append('WHERE id_kat <> null');
       Open;
       DisableControls;
       cobKateg.Items.BeginUpdate;
       First;
       while not Eof do
         begin
-          cobKateg.Items.AddObject(FieldByName('name_kat').AsString, Pointer(FieldByName('id').AsInteger));
+          if FieldByName('d_r').Value = true then
+            sign := '+'
+          else
+            sign := '-';
+          cobKateg.Items.AddObject(sign + FieldByName('name_kat').AsString, Pointer(FieldByName('id').AsInteger));
           Next;
         end;
       cobKateg.Items.EndUpdate;
       EnableControls;
     end;
-
 end;
 
 procedure TfCashDetail.FormShow(Sender: TObject);
@@ -118,6 +124,7 @@ begin
       cobKateg.ItemIndex := -1;
       cobKoshel.ItemIndex := -1;
       eKoment.Text := '';
+      eKol.Text := '1';
     end
   else
     begin
@@ -125,25 +132,29 @@ begin
         with dmCash.adoqReal do
           begin
             deDate.Text := FieldByName('date_v').AsString;
-            ceSumma.Text := FieldByName('sum_d').AsString;
-            cobKateg.ItemIndex := FieldByName('id_prod').AsInteger - 1;
+            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat));
+            cobKateg.ItemIndex := cobKateg.Items.IndexOfObject(FieldByName('id_prod').AsInteger);
             cobKoshel.ItemIndex := cobKoshel.Items.IndexOf(FieldByName('koshel').AsString);
             eKoment.Text := FieldByName('comment').AsString;
+            eKol.Text := FieldByName('kol').AsString;
           end
       else
         with dmCash.adoqVirtual do
           begin
             deDate.Text := FieldByName('date_v').AsString;
-            ceSumma.Text := FieldByName('sum_d').AsString;
+            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat));
             cobKateg.ItemIndex := FieldByName('id_prod').AsInteger - 1;
             cobKoshel.ItemIndex := cobKoshel.Items.IndexOf(FieldByName('koshel').AsString);
             eKoment.Text := FieldByName('comment').AsString;
+            eKol.Text := FieldByName('kol').AsString;
           end;
     end;
 
 end;
 
 procedure TfCashDetail.bOKClick(Sender: TObject);
+var
+  iid: integer;
 begin
   with dmCash do
     begin
@@ -152,8 +163,8 @@ begin
           //вставка нового
           adoqDetail.SQL.Clear;
           adoqDetail.SQL.Append('INSERT INTO '+name_table);
-          adoqDetail.SQL.Append('(month_v,date_v,id_prod,sum_d,koshel,comment)');
-          adoqDetail.SQL.Append('VALUES (:m_v,:d_v,:i_p,:sm,:kos,:com)');
+          adoqDetail.SQL.Append('(month_v,date_v, id_prod, sum_d, koshel, comment, kol)');
+          adoqDetail.SQL.Append('VALUES (:m_v, :d_v, :i_p, :sm, :kos, :com, :kl)');
           adoqDetail.Parameters.ParamByName('m_v').Value := fMainCash.cobMonth.Text + ' ' + fMainCash.spGod.Text;
           adoqDetail.Parameters.ParamByName('d_v').Value := deDate.Date;
           adoqDetail.Parameters.ParamByName('i_p').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
@@ -164,7 +175,26 @@ begin
               adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value;
           adoqDetail.Parameters.ParamByName('kos').Value := cobKoshel.Text;
           adoqDetail.Parameters.ParamByName('com').Value := eKoment.Text;
+          adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
           adoqDetail.ExecSQL;
+
+          if fMainCash.bReal_Virt = true then
+            begin
+              adoqDetail1.SQL.Text := 'SELECT * FROM real_pokup ORDER BY id DESC';
+              adoqDetail1.Open;
+              iid := adoqDetail1.FieldByName('id').AsInteger;
+
+              adoqDetail.SQL.Clear;
+              adoqDetail.SQL.Append('INSERT INTO status_pokup');
+              adoqDetail.SQL.Append('(date_pokup, name_pokup, id_prod, id_pokup, kol)');
+              adoqDetail.SQL.Append('VALUES (:d_p, :n_p, :i_pr, :i_pok, :kl)');
+              adoqDetail.Parameters.ParamByName('d_p').Value := deDate.Date;
+              adoqDetail.Parameters.ParamByName('n_p').Value := cobKateg.Text;
+              adoqDetail.Parameters.ParamByName('i_pr').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
+              adoqDetail.Parameters.ParamByName('i_pok').Value := iid;
+              adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
+              adoqDetail.ExecSQL;
+            end;
           //конец вставка нового
         end
       else
@@ -172,7 +202,7 @@ begin
           //редактирование
           adoqDetail.SQL.Clear;
           adoqDetail.SQL.Append('UPDATE '+name_table);
-          adoqDetail.SQL.Append('SET month_v=:m_v,date_v=:d_v,id_prod=:i_p,sum_d=:sm,koshel=:kos,comment=:com');
+          adoqDetail.SQL.Append('SET month_v=:m_v, date_v=:d_v, id_prod=:i_p, sum_d=:sm, koshel=:kos, comment=:com, kol = :kl');
           adoqDetail.SQL.Append('WHERE id=:iid');
           adoqDetail.Parameters.ParamByName('m_v').Value := fMainCash.cobMonth.Text + ' ' + fMainCash.spGod.Text;
           adoqDetail.Parameters.ParamByName('d_v').Value := deDate.Date;
@@ -188,7 +218,22 @@ begin
             adoqDetail.Parameters.ParamByName('iid').Value := adoqReal.FieldByName('id').Value
           else
             adoqDetail.Parameters.ParamByName('iid').Value := adoqVirtual.FieldByName('id').Value;
+          adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
           adoqDetail.ExecSQL;
+
+          if fMainCash.bReal_Virt = true then
+            begin
+              adoqDetail.SQL.Clear;
+              adoqDetail.SQL.Append('UPDATE status_pokup SET');
+              adoqDetail.SQL.Append('date_pokup = :d_p, name_pokup = :n_p, id_prod = :i_pr, kol = :kl');
+              adoqDetail.SQL.Append('WHERE id_pokup = :i_pok');
+              adoqDetail.Parameters.ParamByName('d_p').Value := deDate.Date;
+              adoqDetail.Parameters.ParamByName('n_p').Value := cobKateg.Text;
+              adoqDetail.Parameters.ParamByName('i_pr').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
+              adoqDetail.Parameters.ParamByName('i_pok').Value := adoqReal.FieldByName('id').Value;
+              adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
+              adoqDetail.ExecSQL;
+            end;
           //конец редактирования
         end;
     end;
