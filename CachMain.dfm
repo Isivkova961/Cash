@@ -606,6 +606,14 @@ object fMainCash: TfMainCash
       Caption = #1055#1086#1082#1091#1087#1082#1080' '#1074' '#1085#1072#1083#1080#1095#1080#1080
       OnClick = nStatusClick
     end
+    object N1: TMenuItem
+      Caption = #1057#1087#1080#1089#1086#1082' '#1087#1086#1082#1091#1087#1086#1082
+      OnClick = N1Click
+    end
+    object nLekar: TMenuItem
+      Caption = #1057#1087#1080#1089#1086#1082' '#1083#1077#1082#1072#1088#1089#1090#1074
+      OnClick = nLekarClick
+    end
   end
   object ilCash: TImageList
     Left = 837

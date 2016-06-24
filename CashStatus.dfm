@@ -1,7 +1,7 @@
 object fStatus: TfStatus
   Left = 430
   Top = 268
-  Width = 729
+  Width = 689
   Height = 504
   BorderIcons = [biSystemMenu]
   Caption = #1057#1090#1072#1090#1091#1089' '#1087#1086#1082#1091#1087#1086#1082
@@ -22,7 +22,7 @@ object fStatus: TfStatus
   object pStatus: TPanel
     Left = 0
     Top = 0
-    Width = 713
+    Width = 673
     Height = 73
     Align = alTop
     Color = clGradientActiveCaption
@@ -95,7 +95,7 @@ object fStatus: TfStatus
   object pStatus1: TPanel
     Left = 0
     Top = 425
-    Width = 713
+    Width = 673
     Height = 41
     Align = alBottom
     Color = clGradientActiveCaption
@@ -104,12 +104,12 @@ object fStatus: TfStatus
   object pData: TPanel
     Left = 0
     Top = 73
-    Width = 713
+    Width = 673
     Height = 352
     Align = alClient
     Color = clGradientInactiveCaption
     TabOrder = 2
-    object Splitter1: TSplitter
+    object sStatus: TSplitter
       Left = 201
       Top = 1
       Height = 350
@@ -119,9 +119,10 @@ object fStatus: TfStatus
     object dbgStatus: TDBGridEh
       Left = 204
       Top = 1
-      Width = 508
+      Width = 468
       Height = 350
       Align = alClient
+      AllowedOperations = [alopUpdateEh, alopDeleteEh]
       DataSource = dmCash.dsStatus
       EvenRowColor = clWhite
       FixedColor = clGradientActiveCaption
@@ -140,6 +141,7 @@ object fStatus: TfStatus
       OddRowColor = clWhite
       Options = [dgTitles, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit]
       ParentFont = False
+      ReadOnly = True
       TabOrder = 0
       TitleFont.Charset = RUSSIAN_CHARSET
       TitleFont.Color = clBlue
@@ -147,46 +149,51 @@ object fStatus: TfStatus
       TitleFont.Name = 'Times New Roman'
       TitleFont.Style = [fsBold]
       UseMultiTitle = True
+      OnCellClick = dbgStatusCellClick
+      OnKeyDown = dbgStatusKeyDown
       Columns = <
         item
           EditButtons = <>
           FieldName = 'date_pokup'
           Footers = <>
           Title.Caption = #1044#1072#1090#1072' '#1087#1086#1082#1091#1087#1082#1080
+          Width = 65
         end
         item
           EditButtons = <>
           FieldName = 'name_pokup'
           Footers = <>
           Title.Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077
-          Width = 100
-        end
-        item
-          EditButtons = <>
-          FieldName = 'the_end'
-          Footers = <>
-          Title.Caption = #1047#1072#1082#1086#1085#1095#1080#1083#1086#1089#1100' | '#1057#1090#1072#1090#1091#1089
-          Width = 52
-        end
-        item
-          EditButtons = <>
-          FieldName = 'date_end'
-          Footers = <>
-          Title.Caption = #1047#1072#1082#1086#1085#1095#1080#1083#1086#1089#1100' | '#1044#1072#1090#1072
-        end
-        item
-          EditButtons = <>
-          FieldName = 'f_show'
-          Footers = <>
-          Title.Caption = #1057#1082#1088#1099#1090#1100
-          Width = 52
+          Width = 120
         end
         item
           EditButtons = <>
           FieldName = 'kol'
           Footers = <>
           Title.Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086
-          Width = 75
+          Width = 71
+        end
+        item
+          Checkboxes = True
+          EditButtons = <>
+          FieldName = 'the_end'
+          Footers = <>
+          Title.Caption = #1047#1072#1082#1086#1085#1095#1080#1083#1086#1089#1100' | '#1057#1090#1072#1090#1091#1089
+          Width = 57
+        end
+        item
+          EditButtons = <>
+          FieldName = 'date_end'
+          Footers = <>
+          Title.Caption = #1047#1072#1082#1086#1085#1095#1080#1083#1086#1089#1100' | '#1044#1072#1090#1072
+          Width = 74
+        end
+        item
+          EditButtons = <>
+          FieldName = 'f_show'
+          Footers = <>
+          Title.Caption = #1057#1082#1088#1099#1090#1100
+          Width = 50
         end>
     end
     object vsgStatus: TVirtualStringTree
@@ -205,6 +212,7 @@ object fStatus: TfStatus
       TabOrder = 1
       OnFreeNode = vsgStatusFreeNode
       OnGetText = vsgStatusGetText
+      OnNodeClick = vsgStatusNodeClick
       Columns = <>
     end
   end

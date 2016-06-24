@@ -37,12 +37,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure VivodData;
     procedure FormShow(Sender: TObject);
-    procedure vstDohodDragOver(Sender: TBaseVirtualTree; Source: TObject;
-      Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode;
-      var Effect: Integer; var Accept: Boolean);
-    procedure vstDohodDragDrop(Sender: TBaseVirtualTree; Source: TObject;
-      DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState;
-      Pt: TPoint; var Effect: Integer; Mode: TDropMode);
     procedure vstDohodStartDrag(Sender: TObject;
       var DragObject: TDragObject);
     procedure TabSheet;
@@ -50,11 +44,16 @@ type
     procedure tbNewClick(Sender: TObject);
     procedure tbDeleteClick(Sender: TObject);
     procedure DeleteRow;
+    procedure pcSpravChange(Sender: TObject);
+    procedure vstDohodKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure ButEnabled;
   private
     { Private declarations }
   public
     bDoh_Rosh, bNew_Edit: boolean;
-    iid_sp: integer;
+    iid_sp, id_kat: integer;
+    name_sp: string;
     { Public declarations }
   end;
 
@@ -243,28 +242,17 @@ begin
       end;
     end;
   vstRashod.EndUpdate;
+  if bDoh_Rosh = true then
+    vstDohod.FocusedNode := vstDohod.GetFirst()
+  else
+    vstRashod.FocusedNode := vstRashod.GetFirst()
 end;
 
 procedure TfSprav.FormShow(Sender: TObject);
 begin
   LoadTable;
-  VivodData;
   TabSheet;
-end;
-
-procedure TfSprav.vstDohodDragOver(Sender: TBaseVirtualTree;
-  Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint;
-  Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
-begin
-  Accept := Sender.DropTargetNode  <> Sender.FocusedNode; // Drop'ать узел сам на себя нельзя
-end;
-
-procedure TfSprav.vstDohodDragDrop(Sender: TBaseVirtualTree;
-  Source: TObject; DataObject: IDataObject; Formats: TFormatArray;
-  Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
-begin
-  if Sender.DropTargetNode = nil then Exit;
-    Sender.MoveTo(Sender.FocusedNode, Sender.DropTargetNode, amInsertAfter, False); // перемещаем узел
+  VivodData;
 end;
 
 procedure TfSprav.vstDohodStartDrag(Sender: TObject;
@@ -279,6 +267,7 @@ begin
     bDoh_Rosh := true
   else
     bDoh_Rosh := false;
+  ButEnabled;
 end;
 
 procedure TfSprav.tbEditClick(Sender: TObject);
@@ -288,18 +277,29 @@ var
 begin
   if bDoh_Rosh = true then
     begin
-      Data := vstDohod.GetNodeData(Node);
-      iid_sp := Data.ID;
+      if dmCash.adoqDohod.RecordCount > 0 then
+        begin
+          Data := vstDohod.GetNodeData(vstDohod.FocusedNode);
+          iid_sp := Data.ID;
+          name_sp := Data.tname;
+          id_kat := Data.pID;
+        end;
     end
   else
     begin
-      Data := vstRashod.GetNodeData(Node);
-      iid_sp := Data.ID;
+      if dmCash.adoqRashod.RecordCount > 0 then
+        begin
+          Data := vstRashod.GetNodeData(vstRashod.FocusedNode);
+          iid_sp := Data.ID;
+          name_sp := Data.tname;
+          id_kat := Data.pID;
+        end;
     end;
   bNew_Edit := false;
   fSpravNE.ShowModal;
   LoadTable;
   VivodData;
+  ButEnabled;
 end;
 
 procedure TfSprav.tbNewClick(Sender: TObject);
@@ -308,6 +308,7 @@ begin
   fSpravNE.ShowModal;
   LoadTable;
   VivodData;
+  ButEnabled;
 end;
 
 procedure TfSprav.tbDeleteClick(Sender: TObject);
@@ -316,28 +317,92 @@ begin
     DeleteRow;
   LoadTable;
   VivodData;
+  ButEnabled;
 end;
 
 procedure TfSprav.DeleteRow;
 var
   Data: PvtWinfo;
   node: PVirtualNode;
+  iiid: array [1..2] of TStringList;
+  i, j, k: integer;
+  del_id, id_sp: string;
 begin
+  for i:=1 to 2 do
+    iiid[i] := TStringList.Create;
   if bDoh_Rosh = true then
     begin
-      Data := vstDohod.GetNodeData(Node);
+      Data := vstDohod.GetNodeData(vstDohod.FocusedNode);
       iid_sp := Data.ID;
     end
   else
     begin
-      Data := vstRashod.GetNodeData(Node);
+      Data := vstRashod.GetNodeData(vstRashod.FocusedNode);
       iid_sp := Data.ID;
     end;
   with dmCash do
     begin
-      adoqSpravData.SQL.Text := 'DELETE FROM sprav_pokup WHERE id = :iid';
-      adoqSpravData.Parameters.ParamByName('iid').Value := iid_sp;
+      adoqSprav.SQL.Clear;
+      adoqSprav.SQL.Append('SELECT * FROM sprav_pokup');
+      adoqSprav.Open;
+      while not (adoqSprav.Eof) do
+        begin
+          iiid[1].Append(adoqSprav.FieldByName('id').AsString);
+          iiid[2].Append(adoqSprav.FieldByName('id_kat').AsString);
+          adoqSprav.Next;
+        end;
+
+
+      adoqSpravData.SQL.Text := 'DELETE FROM sprav_pokup WHERE id in (' + del_id + ') or id_kat in (' + del_id + ')';
       adoqSpravData.ExecSQL;
+    end;
+end;
+
+procedure TfSprav.pcSpravChange(Sender: TObject);
+begin
+  TabSheet;
+end;
+
+procedure TfSprav.vstDohodKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 45 then
+    tbNew.Click;
+  if Key = 13 then
+    if tbEdit.Enabled then
+      tbEdit.Click;
+  if Key = 46 then
+    if tbDelete.Enabled then
+      tbDelete.Click;
+end;
+
+procedure TfSprav.ButEnabled;
+begin
+  if pcSprav.ActivePage = tsDohod then
+    begin
+      if dmCash.adoqDohod.RecordCount = 0 then
+        begin
+          tbEdit.Enabled := false;
+          tbDelete.Enabled := false;
+        end
+      else
+        begin
+          tbEdit.Enabled := true;
+          tbDelete.Enabled := true;
+        end;
+    end
+  else
+    begin
+      if dmCash.adoqRashod.RecordCount = 0 then
+        begin
+          tbEdit.Enabled := false;
+          tbDelete.Enabled := false;
+        end
+      else
+        begin
+          tbEdit.Enabled := true;
+          tbDelete.Enabled := true;
+        end;
     end;
 end;
 

@@ -46,6 +46,8 @@ type
     sgData: TStringGrid;
     dbgVirtual: TDBGridEh;
     nStatus: TMenuItem;
+    N1: TMenuItem;
+    nLekar: TMenuItem;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: WideString);
@@ -84,6 +86,8 @@ type
     procedure sbSpravClick(Sender: TObject);
     procedure spGodChange(Sender: TObject);
     procedure nStatusClick(Sender: TObject);
+    procedure N1Click(Sender: TObject);
+    procedure nLekarClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -111,7 +115,7 @@ var
 
 implementation
 
-uses CashDM, CashDetail, SpravPokup, SpisokPokup, CashStatus;
+uses CashDM, CashDetail, SpravPokup, SpisokPokup, CashStatus, SpisokLekar;
 
 {$R *.dfm}
 
@@ -291,7 +295,7 @@ begin
   with dmCash do
     begin
       adoqDrevo1.SQL.Clear;
-      adoqDrevo1.SQL.Text := 'SELECT * FROM itog';
+      adoqDrevo1.SQL.Text := 'SELECT * FROM itog ORDER BY id ASC';
       adoqDrevo1.Open;
 
       //Строим дерево на основе данных из итоговой таблицы
@@ -482,6 +486,10 @@ begin
   ButEnabled; //Активность кнопок редактирования и удаления
   VivodKat; //Запись категорий и подкатегорий в список
   VivodData; //Вывод дерева
+  dbgReal.EvenRowColor := RGB(214,254,252);
+  dbgReal.OddRowColor := RGB(254,254,214);
+  dbgVirtual.EvenRowColor := RGB(214,254,252);
+  dbgVirtual.OddRowColor := RGB(254,254,214);
 end;
 
 //Отрисовка данных таблицы о суммах
@@ -516,6 +524,9 @@ begin
       end
     else
       begin
+        if sgData.Cells[ACol, ARow] = DateToStr(Date) then
+          if (ACol in ([1, 2, 3])) then
+            sgData.Canvas.Brush.Color := RGB(153, 251, 180);
         if (ACol = 0) then  //Первый столбец
           begin
             if (sgData.Cells[ACol, ARow] = 'сб') or (sgData.Cells[ACol, ARow] = 'вс') then  //Если сб или вс
@@ -805,6 +816,12 @@ begin
           adoqDetail.SQL.Append('WHERE id_pokup = :iid');
           adoqDetail.Parameters.ParamByName('iid').Value := iid;
           adoqDetail.ExecSQL;
+
+          adoqDetail.SQL.Clear;
+          adoqDetail.SQL.Append('DELETE FROM spisok_lekar');
+          adoqDetail.SQL.Append('WHERE id_pokup = :iid');
+          adoqDetail.Parameters.ParamByName('iid').Value := iid;
+          adoqDetail.ExecSQL;
         end
       else
         begin
@@ -847,6 +864,8 @@ var
   i, j: integer;
   s, s1: string;
 begin
+  for i := 1 to 2 do
+    id_prod[i].Clear;
   with dmCash do
     begin
       adoqDrevo.SQL.Text:='SELECT * FROM sprav_pokup';
@@ -934,6 +953,16 @@ end;
 procedure TfMainCash.nStatusClick(Sender: TObject);
 begin
   fStatus.ShowModal;
+end;
+
+procedure TfMainCash.N1Click(Sender: TObject);
+begin
+  fSpisokPokup.ShowModal;
+end;
+
+procedure TfMainCash.nLekarClick(Sender: TObject);
+begin
+  fSpisokLekar.ShowModal;
 end;
 
 end.

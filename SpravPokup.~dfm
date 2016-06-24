@@ -1,6 +1,6 @@
 object fSprav: TfSprav
-  Left = 498
-  Top = 238
+  Left = 588
+  Top = 347
   Width = 487
   Height = 438
   BorderIcons = [biSystemMenu]
@@ -23,7 +23,6 @@ object fSprav: TfSprav
     Top = 0
     Width = 471
     Height = 29
-    ButtonHeight = 26
     ButtonWidth = 26
     Flat = True
     Images = ilSprav
@@ -75,6 +74,7 @@ object fSprav: TfSprav
       Align = alClient
       HotTrack = True
       TabOrder = 0
+      OnChange = pcSpravChange
       object tsDohod: TTabSheet
         Caption = #1044#1086#1093#1086#1076#1099
         object vstDohod: TVirtualStringTree
@@ -102,8 +102,9 @@ object fSprav: TfSprav
           TabOrder = 0
           TreeOptions.PaintOptions = [toHideFocusRect, toShowButtons, toShowDropmark, toShowHorzGridLines, toShowRoot, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
           TreeOptions.StringOptions = [toAutoAcceptEditChange]
-          OnFreeNode = vstRashodFreeNode
-          OnGetText = vstRashodGetText
+          OnFreeNode = vstDohodFreeNode
+          OnGetText = vstDohodGetText
+          OnKeyDown = vstDohodKeyDown
           Columns = <
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment]
@@ -168,7 +169,7 @@ object fSprav: TfSprav
   object ilSprav: TImageList
     Left = 184
     Bitmap = {
-      494C010103000400040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
+      494C010103000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -304,6 +305,7 @@ object fSprav: TfSprav
       87F3C00183FF000087E3C00180FF000083E7C001807F0000C187C001C03F0000
       E187C001E01F0000E01FC001F00F0000F01FC001F8070000F03FC001FC030000
       E01FC001FE010000800FC001FF0000000187C003FF80000007E1C007FFC00000
-      07F0C00FFFE10000FFFFC01FFFF30000}
+      07F0C00FFFE10000FFFFC01FFFF3000000000000000000000000000000000000
+      000000000000}
   end
 end

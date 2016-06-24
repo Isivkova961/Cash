@@ -2,7 +2,7 @@ object dmCash: TdmCash
   OldCreateOrder = False
   Left = 597
   Top = 211
-  Height = 329
+  Height = 359
   Width = 460
   object adocCash: TADOConnection
     Connected = True
@@ -114,13 +114,18 @@ object dmCash: TdmCash
   end
   object adoqSpisok: TADOQuery
     Connection = adocCash
+    AfterInsert = adoqSpisokAfterInsert
     Parameters = <>
     Left = 328
     Top = 152
   end
   object adoqStatus: TADOQuery
     Connection = adocCash
+    CursorType = ctStatic
+    AfterInsert = adoqStatusAfterInsert
     Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM status_pokup')
     Left = 328
     Top = 200
   end
@@ -140,5 +145,32 @@ object dmCash: TdmCash
     Parameters = <>
     Left = 176
     Top = 40
+  end
+  object dsSpisok: TDataSource
+    DataSet = adoqSpisok
+    Left = 376
+    Top = 152
+  end
+  object adoqLekar: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    AfterInsert = adoqLekarAfterInsert
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM spisok_lekar')
+    Left = 328
+    Top = 96
+  end
+  object dsLekar: TDataSource
+    DataSet = adoqLekar
+    Left = 376
+    Top = 96
+  end
+  object adoqDrevo2: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 136
+    Top = 264
   end
 end

@@ -4,7 +4,7 @@ object fSpravNE: TfSpravNE
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = #1054#1082#1085#1086' '#1088#1077#1076#1072#1082#1090#1086#1088#1072
-  ClientHeight = 155
+  ClientHeight = 165
   ClientWidth = 277
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
@@ -15,6 +15,7 @@ object fSpravNE: TfSpravNE
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 17
@@ -22,7 +23,7 @@ object fSpravNE: TfSpravNE
     Left = 0
     Top = 0
     Width = 277
-    Height = 126
+    Height = 136
     Align = alClient
     Color = clGradientInactiveCaption
     TabOrder = 0
@@ -45,8 +46,11 @@ object fSpravNE: TfSpravNE
       Top = 8
       Width = 145
       Height = 25
+      Style = csDropDownList
       ItemHeight = 17
       TabOrder = 0
+      OnChange = cobKategChange
+      OnKeyDown = cobKategKeyDown
     end
     object eName: TEdit
       Left = 112
@@ -57,7 +61,7 @@ object fSpravNE: TfSpravNE
     end
     object bSave: TButton
       Left = 32
-      Top = 80
+      Top = 96
       Width = 90
       Height = 30
       Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
@@ -66,17 +70,25 @@ object fSpravNE: TfSpravNE
     end
     object bCancel: TButton
       Left = 136
-      Top = 80
+      Top = 96
       Width = 90
       Height = 30
       Caption = #1054#1090#1084#1077#1085#1080#1090#1100
       TabOrder = 3
       OnClick = bCancelClick
     end
+    object cebMed: TCheckBox
+      Left = 16
+      Top = 72
+      Width = 113
+      Height = 17
+      Caption = #1052#1077#1076#1080#1082#1072#1084#1077#1085#1090#1099
+      TabOrder = 4
+    end
   end
   object pSpravNE1: TPanel
     Left = 0
-    Top = 126
+    Top = 136
     Width = 277
     Height = 29
     Align = alBottom

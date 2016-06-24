@@ -1,6 +1,6 @@
 object fSprav: TfSprav
-  Left = 498
-  Top = 238
+  Left = 588
+  Top = 347
   Width = 487
   Height = 438
   BorderIcons = [biSystemMenu]
@@ -23,7 +23,6 @@ object fSprav: TfSprav
     Top = 0
     Width = 471
     Height = 29
-    ButtonHeight = 26
     ButtonWidth = 26
     Flat = True
     Images = ilSprav
@@ -71,7 +70,7 @@ object fSprav: TfSprav
       Top = 1
       Width = 469
       Height = 337
-      ActivePage = tsRashod
+      ActivePage = tsDohod
       Align = alClient
       HotTrack = True
       TabOrder = 0
@@ -105,6 +104,7 @@ object fSprav: TfSprav
           TreeOptions.StringOptions = [toAutoAcceptEditChange]
           OnFreeNode = vstDohodFreeNode
           OnGetText = vstDohodGetText
+          OnKeyDown = vstDohodKeyDown
           Columns = <
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment]
@@ -149,7 +149,7 @@ object fSprav: TfSprav
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment]
               Position = 0
-              Width = 457
+              Width = 461
               WideText = #1057#1090#1072#1090#1100#1103' '#1073#1102#1076#1078#1077#1090#1072
             end>
           WideDefaultText = ''

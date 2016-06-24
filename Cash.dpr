@@ -8,7 +8,8 @@ uses
   CashDetail in 'CashDetail.pas' {fCashDetail},
   SpravNE in 'SpravNE.pas' {fSpravNE},
   SpisokPokup in 'SpisokPokup.pas' {fSpisokPokup},
-  CashStatus in 'CashStatus.pas' {fStatus};
+  CashStatus in 'CashStatus.pas' {fStatus},
+  SpisokLekar in 'SpisokLekar.pas' {fSpisokLekar};
 
 {$R *.res}
 
@@ -16,11 +17,12 @@ begin
   Application.Initialize;
   Application.Title := 'Cash 1.0';
   Application.CreateForm(TfMainCash, fMainCash);
+  Application.CreateForm(TfStatus, fStatus);
   Application.CreateForm(TfSprav, fSprav);
   Application.CreateForm(TfCashDetail, fCashDetail);
   Application.CreateForm(TdmCash, dmCash);
   Application.CreateForm(TfSpravNE, fSpravNE);
   Application.CreateForm(TfSpisokPokup, fSpisokPokup);
-  Application.CreateForm(TfStatus, fStatus);
+  Application.CreateForm(TfSpisokLekar, fSpisokLekar);
   Application.Run;
 end.

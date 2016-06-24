@@ -45,12 +45,17 @@ type
     procedure tbDeleteClick(Sender: TObject);
     procedure DeleteRow;
     procedure pcSpravChange(Sender: TObject);
+    procedure vstDohodKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure ButEnabled;
+    procedure VivodKat;
   private
     { Private declarations }
   public
     bDoh_Rosh, bNew_Edit: boolean;
     iid_sp, id_kat: integer;
     name_sp: string;
+    id_prod: array [1..2] of TStringList;
     { Public declarations }
   end;
 
@@ -158,11 +163,15 @@ begin
 end;
 
 procedure TfSprav.FormCreate(Sender: TObject);
+var
+  i: integer;
 begin
   //выделение памяти под структуру
   vstDohod.NodeDataSize := SizeOf(RvtWinfo);
   //выделение памяти под структуру
   vstRashod.NodeDataSize := SizeOf(RvtWinfo);
+  for i := 1 to 2 do
+    id_prod[i] := TStringList.Create;
 end;
 
 //создание дерева
@@ -239,13 +248,18 @@ begin
       end;
     end;
   vstRashod.EndUpdate;
+  if bDoh_Rosh = true then
+    vstDohod.FocusedNode := vstDohod.GetFirst()
+  else
+    vstRashod.FocusedNode := vstRashod.GetFirst()
 end;
 
 procedure TfSprav.FormShow(Sender: TObject);
 begin
   LoadTable;
-  VivodData;
   TabSheet;
+  VivodData;
+  VivodKat;
 end;
 
 procedure TfSprav.vstDohodStartDrag(Sender: TObject;
@@ -260,6 +274,7 @@ begin
     bDoh_Rosh := true
   else
     bDoh_Rosh := false;
+  ButEnabled;
 end;
 
 procedure TfSprav.tbEditClick(Sender: TObject);
@@ -269,22 +284,30 @@ var
 begin
   if bDoh_Rosh = true then
     begin
-      Data := vstDohod.GetNodeData(vstDohod.FocusedNode);
-      iid_sp := Data.ID;
-      name_sp := Data.tname;
-      id_kat := Data.pID;
+      if dmCash.adoqDohod.RecordCount > 0 then
+        begin
+          Data := vstDohod.GetNodeData(vstDohod.FocusedNode);
+          iid_sp := Data.ID;
+          name_sp := Data.tname;
+          id_kat := Data.pID;
+        end;
     end
   else
     begin
-      Data := vstRashod.GetNodeData(vstRashod.FocusedNode);
-      iid_sp := Data.ID;
-      name_sp := Data.tname;
-      id_kat := Data.pID;
+      if dmCash.adoqRashod.RecordCount > 0 then
+        begin
+          Data := vstRashod.GetNodeData(vstRashod.FocusedNode);
+          iid_sp := Data.ID;
+          name_sp := Data.tname;
+          id_kat := Data.pID;
+        end;
     end;
   bNew_Edit := false;
   fSpravNE.ShowModal;
   LoadTable;
   VivodData;
+  ButEnabled;
+  VivodKat;
 end;
 
 procedure TfSprav.tbNewClick(Sender: TObject);
@@ -293,6 +316,8 @@ begin
   fSpravNE.ShowModal;
   LoadTable;
   VivodData;
+  ButEnabled;
+  VivodKat;
 end;
 
 procedure TfSprav.tbDeleteClick(Sender: TObject);
@@ -301,12 +326,16 @@ begin
     DeleteRow;
   LoadTable;
   VivodData;
+  ButEnabled;
+  VivodKat;
 end;
 
 procedure TfSprav.DeleteRow;
 var
   Data: PvtWinfo;
   node: PVirtualNode;
+  i, j, k: integer;
+  del_id, id_sp: string;
 begin
   if bDoh_Rosh = true then
     begin
@@ -320,8 +349,11 @@ begin
     end;
   with dmCash do
     begin
-      adoqSpravData.SQL.Text := 'DELETE FROM sprav_pokup WHERE id = :iid';
-      adoqSpravData.Parameters.ParamByName('iid').Value := iid_sp;
+      i := id_prod[1].IndexOf(IntToStr(iid_sp));
+      if i > - 1 then
+        del_id := IntToStr(iid_sp) + ',' + id_prod[2][i];
+      delete(del_id, length(del_id), 1);
+      adoqSpravData.SQL.Text := 'DELETE FROM sprav_pokup WHERE id in (' + del_id + ')';
       adoqSpravData.ExecSQL;
     end;
 end;
@@ -330,5 +362,114 @@ procedure TfSprav.pcSpravChange(Sender: TObject);
 begin
   TabSheet;
 end;
+
+procedure TfSprav.vstDohodKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 45 then
+    tbNew.Click;
+  if Key = 13 then
+    if tbEdit.Enabled then
+      tbEdit.Click;
+  if Key = 46 then
+    if tbDelete.Enabled then
+      tbDelete.Click;
+end;
+
+procedure TfSprav.ButEnabled;
+begin
+  if pcSprav.ActivePage = tsDohod then
+    begin
+      if dmCash.adoqDohod.RecordCount = 0 then
+        begin
+          tbEdit.Enabled := false;
+          tbDelete.Enabled := false;
+        end
+      else
+        begin
+          tbEdit.Enabled := true;
+          tbDelete.Enabled := true;
+        end;
+    end
+  else
+    begin
+      if dmCash.adoqRashod.RecordCount = 0 then
+        begin
+          tbEdit.Enabled := false;
+          tbDelete.Enabled := false;
+        end
+      else
+        begin
+          tbEdit.Enabled := true;
+          tbDelete.Enabled := true;
+        end;
+    end;
+end;
+
+//Сбор данных о категориях и подкатегориях
+procedure TfSprav.VivodKat;
+var
+  i, j: integer;
+  s, s1: string;
+begin
+  for i := 1 to 2 do
+    id_prod[i].Clear;
+  with dmCash do
+    begin
+      adoqDrevo2.SQL.Text:='SELECT * FROM sprav_pokup';
+      adoqDrevo2.Open;
+
+      while not (adoqDrevo2.Eof) do
+        begin
+          id_prod[1].Append(adoqDrevo2.FieldByName('id').AsString);
+          id_prod[2].Append('');
+          adoqDrevo2.Next;
+        end;
+      for j:=0 to id_prod[1].Count - 1 do
+        begin
+          adoqDrevo2.Filter := 'id_kat = ' + id_prod[1][j];
+          adoqDrevo2.Filtered := true;
+          adoqDrevo2.First;
+          while not (adoqDrevo2.Eof) do
+            begin
+              s := ' ';
+              id_prod[2][j] := id_prod[2][j] + s + adoqDrevo2.FieldByName('id').AsString + ',';
+              adoqDrevo2.Next;
+            end;
+        end;
+    end;
+
+  j := 0;
+  while j < id_prod[1].Count - 1 do
+    begin
+      s := id_prod[2][j];
+      if s = '' then
+        j := j + 1
+      else
+        begin
+          if s <> '' then
+            delete(s, 1, 1);
+          while length(s) > 0 do
+            begin
+              if pos(', ', s) > 0 then
+                s1 := copy(s, 1, pos(', ', s) - 1)
+              else
+                s1 := copy(s, 1, pos(',', s) - 1);
+              delete(s, 1, length(s1) + 2);
+              i := id_prod[1].IndexOf(s1);
+              if id_prod[2][i] <> '' then
+                begin
+                  id_prod[2][j] := id_prod[2][j] + id_prod[2][i];
+                  if s <> '' then
+                    s := s + ' ';
+                  s := s + copy(id_prod[2][i], 2, length(id_prod[2][i]));
+
+                end;
+            end;
+          j := j + 1;
+        end;
+    end;
+end;
+
 
 end.

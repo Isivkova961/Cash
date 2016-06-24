@@ -64,6 +64,7 @@ begin
       SQL.Clear;
       SQL.Append('SELECT * FROM sprav_pokup WHERE d_r = true');
       SQL.Append('and id_kat <> null');
+      SQL.Append('ORDER BY name_kat ASC');
       Open;
       DisableControls;
       cobKoshel.Items.BeginUpdate;
@@ -82,6 +83,7 @@ begin
       SQL.Clear;
       SQL.Append('SELECT * FROM sprav_pokup');
       SQL.Append('WHERE id_kat <> null');
+      SQL.Append('ORDER BY d_r, name_kat ASC');
       Open;
       DisableControls;
       cobKateg.Items.BeginUpdate;
@@ -104,6 +106,7 @@ procedure TfCashDetail.FormShow(Sender: TObject);
 begin
   LoadTable;
   NewDetail;
+  ceSumma.SetFocus;
 end;
 
 procedure TfCashDetail.bCancelClick(Sender: TObject);
@@ -186,22 +189,39 @@ begin
           adoqDetail.ExecSQL;
 
           if fMainCash.bReal_Virt = true then
-            begin
-              adoqDetail1.SQL.Text := 'SELECT * FROM real_pokup ORDER BY id DESC';
-              adoqDetail1.Open;
-              iid := adoqDetail1.FieldByName('id').AsInteger;
+            if adoqSprav.FieldByName('d_r').Value = false then
+              if adoqSprav.FieldByName('lek').Value = false then
+                begin
+                  adoqDetail1.SQL.Text := 'SELECT * FROM real_pokup ORDER BY id DESC';
+                  adoqDetail1.Open;
+                  iid := adoqDetail1.FieldByName('id').AsInteger;
 
-              adoqDetail.SQL.Clear;
-              adoqDetail.SQL.Append('INSERT INTO status_pokup');
-              adoqDetail.SQL.Append('(date_pokup, name_pokup, id_prod, id_pokup, kol)');
-              adoqDetail.SQL.Append('VALUES (:d_p, :n_p, :i_pr, :i_pok, :kl)');
-              adoqDetail.Parameters.ParamByName('d_p').Value := deDate.Date;
-              adoqDetail.Parameters.ParamByName('n_p').Value := cobKateg.Text;
-              adoqDetail.Parameters.ParamByName('i_pr').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
-              adoqDetail.Parameters.ParamByName('i_pok').Value := iid;
-              adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
-              adoqDetail.ExecSQL;
-            end;
+                  adoqDetail.SQL.Clear;
+                  adoqDetail.SQL.Append('INSERT INTO status_pokup');
+                  adoqDetail.SQL.Append('(date_pokup, name_pokup, id_prod, id_pokup, kol)');
+                  adoqDetail.SQL.Append('VALUES (:d_p, :n_p, :i_pr, :i_pok, :kl)');
+                  adoqDetail.Parameters.ParamByName('d_p').Value := deDate.Date;
+                  adoqDetail.Parameters.ParamByName('n_p').Value := copy(cobKateg.Text, 2, length(cobKateg.Text));
+                  adoqDetail.Parameters.ParamByName('i_pr').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
+                  adoqDetail.Parameters.ParamByName('i_pok').Value := iid;
+                  adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
+                  adoqDetail.ExecSQL;
+                end
+              else
+                begin
+                  adoqDetail1.SQL.Text := 'SELECT * FROM real_pokup ORDER BY id DESC';
+                  adoqDetail1.Open;
+                  iid := adoqDetail1.FieldByName('id').AsInteger;
+
+                  adoqDetail.SQL.Clear;
+                  adoqDetail.SQL.Append('INSERT INTO spisok_lekar');
+                  adoqDetail.SQL.Append('(name_lek, id_pokup, kol)');
+                  adoqDetail.SQL.Append('VALUES (:n_l, :i_pok, :kl)');
+                  adoqDetail.Parameters.ParamByName('n_l').Value := copy(cobKateg.Text, 2, length(cobKateg.Text));
+                  adoqDetail.Parameters.ParamByName('i_pok').Value := iid;
+                  adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
+                  adoqDetail.ExecSQL;
+                end;
           //конец вставка нового
         end
       else
@@ -229,18 +249,35 @@ begin
           adoqDetail.ExecSQL;
 
           if fMainCash.bReal_Virt = true then
-            begin
-              adoqDetail.SQL.Clear;
-              adoqDetail.SQL.Append('UPDATE status_pokup SET');
-              adoqDetail.SQL.Append('date_pokup = :d_p, name_pokup = :n_p, id_prod = :i_pr, kol = :kl');
-              adoqDetail.SQL.Append('WHERE id_pokup = :i_pok');
-              adoqDetail.Parameters.ParamByName('d_p').Value := deDate.Date;
-              adoqDetail.Parameters.ParamByName('n_p').Value := cobKateg.Text;
-              adoqDetail.Parameters.ParamByName('i_pr').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
-              adoqDetail.Parameters.ParamByName('i_pok').Value := adoqReal.FieldByName('id').Value;
-              adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
-              adoqDetail.ExecSQL;
-            end;
+            if adoqSprav.FieldByName('d_r').Value = false then
+              if adoqSprav.FieldByName('lek').Value = false then
+                begin
+                  adoqDetail.SQL.Clear;
+                  adoqDetail.SQL.Append('UPDATE status_pokup SET');
+                  adoqDetail.SQL.Append('date_pokup = :d_p, name_pokup = :n_p, id_prod = :i_pr, kol = :kl');
+                  adoqDetail.SQL.Append('WHERE id_pokup = :i_pok');
+                  adoqDetail.Parameters.ParamByName('d_p').Value := deDate.Date;
+                  adoqDetail.Parameters.ParamByName('n_p').Value := copy(cobKateg.Text, 2, length(cobKateg.Text));
+                  adoqDetail.Parameters.ParamByName('i_pr').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
+                  adoqDetail.Parameters.ParamByName('i_pok').Value := adoqReal.FieldByName('id').Value;
+                  adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
+                  adoqDetail.ExecSQL;
+                end
+              else
+                begin
+                  adoqDetail1.SQL.Text := 'SELECT * FROM real_pokup ORDER BY id DESC';
+                  adoqDetail1.Open;
+                  iid := adoqDetail1.FieldByName('id').AsInteger;
+
+                  adoqDetail.SQL.Clear;
+                  adoqDetail.SQL.Append('UPDATE spisok_lekar SET');
+                  adoqDetail.SQL.Append('name_lek = :n_l, kol = :kl');
+                  adoqDetail.SQL.Append('WHERE id_pokup = :i_pok');
+                  adoqDetail.Parameters.ParamByName('n_l').Value := copy(cobKateg.Text, 2, length(cobKateg.Text));
+                  adoqDetail.Parameters.ParamByName('i_pok').Value := adoqReal.FieldByName('id').Value;
+                  adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
+                  adoqDetail.ExecSQL;
+                end;
           //конец редактирования
         end;
     end;

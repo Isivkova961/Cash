@@ -1,0 +1,202 @@
+unit SpisokLekar;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, GridsEh, DBGridEh, ExtCtrls, ComObj, Menus, StdCtrls;
+
+type
+  TfSpisokLekar = class(TForm)
+    pSpisok1: TPanel;
+    pSpisok2: TPanel;
+    pSpisok3: TPanel;
+    dbgLekar: TDBGridEh;
+    cebOpen: TCheckBox;
+    mmLekar: TMainMenu;
+    nExcel: TMenuItem;
+    procedure FormShow(Sender: TObject);
+    procedure LoadData(str: string);
+    procedure nExcelClick(Sender: TObject);
+    procedure cebOpenClick(Sender: TObject);
+    procedure dbgLekarKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgLekarCellClick(Column: TColumnEh);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  fSpisokLekar: TfSpisokLekar;
+
+implementation
+
+uses CashDM;
+
+{$R *.dfm}
+
+procedure TfSpisokLekar.FormShow(Sender: TObject);
+begin
+  LoadData('WHERE f_show = false');
+  dbgLekar.EvenRowColor := RGB(214,254,252);
+  dbgLekar.OddRowColor := RGB(254,254,214);
+end;
+
+procedure TfSpisokLekar.LoadData(str: string);
+begin
+  with dmCash do
+    begin
+      adoqLekar.SQL.Clear;
+      adoqLekar.SQL.Append('SELECT * FROM spisok_lekar');
+      adoqLekar.SQL.Append(str);
+      adoqLekar.SQL.Append('ORDER BY name_lek ASC');
+      adoqLekar.Open;
+    end;
+end;
+
+procedure TfSpisokLekar.nExcelClick(Sender: TObject);
+var
+    XLApp, Sheet, Colum: Variant;
+    index: Integer;
+begin
+  XLApp:=CreateOleObject('Excel.Application');
+  XLApp.Visible := false;
+  XLApp.Workbooks.Add(-4167);
+  XLApp.Workbooks[1].WorkSheets[1].Name := 'Список лекарств';
+  Colum := XLApp.Workbooks[1].WorkSheets[1].Columns;
+  Colum.Columns[1].ColumnWidth := 28.86;
+  Colum.Columns[2].ColumnWidth := 12;
+  Colum.Columns[3].ColumnWidth := 12;
+  Sheet:=XLApp.Workbooks[1].WorkSheets[1];
+  XLApp.Selection.WrapText := true;
+  Sheet.Cells[1, 1]:='Наименование';
+  Sheet.Cells[1, 2]:='Срок годности';
+  Sheet.Cells[1, 3]:='Количество';
+  index:=2;
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 3]].Select;
+  XLApp.Selection.WrapText := true;
+  XLApp.Selection.HorizontalAlignment := - 4108;
+  XLApp.Selection.Font.Bold := true;
+
+  LoadData('WHERE f_show = false');
+  with dmCash do
+    begin
+      adoqLekar.First;
+      while not (adoqLekar.Eof) do
+        begin
+          Sheet.Cells[index, 1] := adoqLekar.FieldByName('name_lek').AsString;
+          Sheet.Cells[index, 2] := adoqLekar.FieldByName('date_srok_god').AsString;
+          Sheet.Cells[index, 3] := adoqLekar.FieldByName('kol').AsString;
+          adoqLekar.Next;
+          inc(index);
+        end;
+    end;
+
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[index-1, 3]].Select;
+  XLApp.Selection.Borders.LineStyle := 1;
+  XLApp.Selection.Borders.Weight := 2;
+  XLApp.Selection.WrapText := true;
+  XLApp.Selection.Font.Size := 10;
+  XLApp.Selection.Font.Name := 'Times New Roman';
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.Orientation := 1;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.LeftMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.RightMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.TopMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.BottomMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.HeaderMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.FooterMargin := 15;
+
+  ShowMessage('Список лекарств выведен!');
+  XLApp.Visible := true;
+
+end;
+
+procedure TfSpisokLekar.cebOpenClick(Sender: TObject);
+begin
+  if cebOpen.Checked then
+    LoadData('WHERE f_show = true')
+  else
+    LoadData('WHERE f_show = false');
+end;
+
+procedure TfSpisokLekar.dbgLekarKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if dmCash.adoqLekar.RecordCount > 0 then
+    if Key = 13 then
+      begin
+        dbgLekar.Options := dbgLekar.Options - [dgRowSelect];
+        dbgLekar.Options := dbgLekar.Options + [dgEditing];
+        dbgLekar.ReadOnly := false;
+        with dmCash.adoqLekar do
+          begin
+            Edit;
+            Post;
+            if dbgLekar.SelectedIndex = 6 then
+              begin
+                LoadData('WHERE f_show = false');
+              end;
+          end;
+      end;
+  if Key = 45 then
+    begin
+      dbgLekar.Options := dbgLekar.Options - [dgRowSelect];
+      dbgLekar.Options := dbgLekar.Options + [dgEditing];
+      dbgLekar.ReadOnly := false;
+      with dmCash.adoqLekar do
+        begin
+          Insert;
+          Post;
+        end;
+    end;
+  if dmCash.adoqLekar.RecordCount > 0 then
+    if key = 46 then
+      if MessageDlg('Вы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
+        dmCash.adoqLekar.Delete;
+end;
+
+procedure TfSpisokLekar.dbgLekarCellClick(Column: TColumnEh);
+begin
+  if dbgLekar.SelectedIndex = 4 then
+    begin
+      dmCash.adoqLekar.Edit;
+      if dbgLekar.SelectedField.Value = false then
+        begin
+          dbgLekar.SelectedIndex := dbgLekar.SelectedIndex + 1;
+          dbgLekar.SelectedField.Value := Date;
+          with dmCash do
+            begin
+              adoqSpisok.SQL.Clear;
+              adoqSpisok.SQL.Append('SELECT * FROM spisok_pokup');
+              adoqSpisok.SQL.Append('ORDER BY name_pokup ASC');
+              adoqSpisok.Open;
+              if adoqSpisok.Locate('name_pokup',adoqLekar.FieldByName('name_lek').AsString,[]) = false then
+                begin
+                  adoqSpisok.Insert;
+                  adoqSpisok.FieldByName('name_pokup').Value := adoqLekar.FieldByName('name_lek').Value;
+                  adoqSpisok.Post;
+                end
+              else
+                if adoqSpisok.FieldByName('status').Value = true then
+                  begin
+                    adoqSpisok.Edit;
+                    adoqSpisok.FieldByName('status').Value := false;
+                    adoqSpisok.Post;
+                  end;
+            end;
+        end;
+    end;
+end;
+
+procedure TfSpisokLekar.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  dbgLekar.Options := dbgLekar.Options + [dgRowSelect];
+  dbgLekar.Options := dbgLekar.Options - [dgEditing];
+  dbgLekar.ReadOnly := true;
+end;
+
+end.

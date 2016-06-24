@@ -27,6 +27,13 @@ type
     adoqSpravoch: TADOQuery;
     dsStatus: TDataSource;
     adoqDetail1: TADOQuery;
+    dsSpisok: TDataSource;
+    adoqLekar: TADOQuery;
+    dsLekar: TDataSource;
+    adoqDrevo2: TADOQuery;
+    procedure adoqLekarAfterInsert(DataSet: TDataSet);
+    procedure adoqStatusAfterInsert(DataSet: TDataSet);
+    procedure adoqSpisokAfterInsert(DataSet: TDataSet);
   private
     { Private declarations }
   public
@@ -39,5 +46,22 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TdmCash.adoqLekarAfterInsert(DataSet: TDataSet);
+begin
+  adoqLekar.FieldByName('f_show').Value := false;
+  adoqLekar.FieldByName('the_end').Value := false;
+end;
+
+procedure TdmCash.adoqStatusAfterInsert(DataSet: TDataSet);
+begin
+  adoqStatus.FieldByName('f_show').Value := false;
+  adoqStatus.FieldByName('the_end').Value := false;
+end;
+
+procedure TdmCash.adoqSpisokAfterInsert(DataSet: TDataSet);
+begin
+  adoqSpisok.FieldByName('status').Value := false;
+end;
 
 end.

@@ -21,7 +21,7 @@ type
     pData: TPanel;
     dbgStatus: TDBGridEh;
     vsgStatus: TVirtualStringTree;
-    Splitter1: TSplitter;
+    sStatus: TSplitter;
     procedure FormShow(Sender: TObject);
     procedure LoadTable;
     procedure cobNameChange(Sender: TObject);
@@ -45,6 +45,8 @@ type
     procedure InitNode(node: PVirtualNode);
     procedure FormCreate(Sender: TObject);
     procedure LoadDrevo;
+    procedure vsgStatusNodeClick(Sender: TBaseVirtualTree;
+      const HitInfo: THitInfo);
 
   private
     { Private declarations }
@@ -220,23 +222,62 @@ begin
           begin
             Edit;
             Post;
-            if dbgStatus.SelectedIndex = 4 then
+            if dbgStatus.SelectedIndex = 5 then
               begin
                 LoadData('WHERE f_show = false');
+                LoadDrevo;
               end;
           end;
       end;
+  if Key = 45 then
+    begin
+      dbgStatus.Options := dbgStatus.Options - [dgRowSelect];
+      dbgStatus.Options := dbgStatus.Options + [dgEditing];
+      dbgStatus.ReadOnly := false;
+      with dmCash.adoqStatus do
+        begin
+          Insert;
+          Post;
+        end;
+    end;
+  if dmCash.adoqStatus.RecordCount > 0 then
+    if key = 46 then
+      if MessageDlg('¬ы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
+        begin
+          dmCash.adoqStatus.Delete;
+          LoadDrevo;
+        end;
 end;
 
 procedure TfStatus.dbgStatusCellClick(Column: TColumnEh);
 begin
-  if dbgStatus.SelectedIndex = 2 then
+  if dbgStatus.SelectedIndex = 3 then
     begin
       dmCash.adoqStatus.Edit;
       if dbgStatus.SelectedField.Value = false then
         begin
           dbgStatus.SelectedIndex := dbgStatus.SelectedIndex + 1;
           dbgStatus.SelectedField.Value := Date;
+          with dmCash do
+            begin
+              adoqSpisok.SQL.Clear;
+              adoqSpisok.SQL.Append('SELECT * FROM spisok_pokup');
+              adoqSpisok.SQL.Append('ORDER BY name_pokup ASC');
+              adoqSpisok.Open;
+              if adoqSpisok.Locate('name_pokup',adoqStatus.FieldByName('name_pokup').AsString,[]) = false then
+                begin
+                  adoqSpisok.Insert;
+                  adoqSpisok.FieldByName('name_pokup').Value := adoqStatus.FieldByName('name_pokup').Value;
+                  adoqSpisok.Post;
+                end
+              else
+                if adoqSpisok.FieldByName('status').Value = true then
+                  begin
+                    adoqSpisok.Edit;
+                    adoqSpisok.FieldByName('status').Value := false;
+                    adoqSpisok.Post;
+                  end;
+            end;
         end;
     end;
 end;
@@ -276,9 +317,9 @@ begin
   with dmCash do
     begin
       Data := vsgStatus.GetNodeData(Node);
-      Data.ID := adoqSprav.FieldByName('id').AsInteger;
-      Data.tname := adoqSprav.FieldByName('name_kat').AsString;
-      Data.pID := adoqSprav.FieldByName('id_kat').AsInteger;
+      Data.ID := adoqSpravoch.FieldByName('id').AsInteger;
+      Data.tname := adoqSpravoch.FieldByName('name_kat').AsString;
+      Data.pID := adoqSpravoch.FieldByName('id_kat').AsInteger;
     end;
 end;
 
@@ -292,7 +333,9 @@ procedure TfStatus.LoadDrevo;
 var
   iid_prod, s: string;
   prod_id: TStringList;
-  index: integer;
+  index, i: integer;
+  node, node1: PVirtualNode;
+  Data: PvtWinfo;
 begin
   prod_id := TStringList.Create;
   prod_id.Sorted := true;
@@ -303,21 +346,77 @@ begin
       adoqStatus.First;
       while not (adoqStatus.Eof) do
         begin
-          index := fMainCash.id_prod[1].IndexOf(adoqStatus.FieldByName('id_prod').AsString);
-          if index > - 1 then
-            s := fMainCash.id_prod[2][index];
-          while length(s) > 0 do
-            begin
-              prod_id.Append(copy(s, pos(' ', s) + 1, pos(',', s) - pos(' ', s) - 1));
-              delete(s, pos(' ', s), pos(',',s) - pos(' ', s) + 1);
-            end;
+          for i := 0 to fMainCash.id_prod[1].Count - 1 do
+            if (pos(' ' + adoqStatus.FieldByName('id_prod').AsString + ',', fMainCash.id_prod[2][i]) > 0)
+                OR (fMainCash.id_prod[1][i] = adoqStatus.FieldByName('id_prod').AsString) then
+              prod_id.Append(fMainCash.id_prod[1][i]);
           adoqStatus.Next;
         end;
-      adoqSpravoch.SQL.Clear;
-      adoqSpravoch.SQL.Append('SELECT sprav_pokup.*');
-      adoqSpravoch.SQL.Append('FROM sprav_pokup LEFT JOIN status_pokup');
-      adoqSpravoch.SQL.Append('ON sprav_pokup.id = status_pokup.id');
-      adoqSpravoch.SQL.Append('WHERE sprav_pokup.id in ('+iid_prod+')');
+      for i := 0 to prod_id.Count - 1 do
+        begin
+          if iid_prod = ''  then
+            iid_prod := prod_id[i]
+          else
+            iid_prod := iid_prod + ',' + prod_id[i];
+        end;
+      if iid_prod <> '' then
+        begin
+          adoqSpravoch.SQL.Clear;
+          adoqSpravoch.SQL.Append('SELECT *');
+          adoqSpravoch.SQL.Append('FROM sprav_pokup');
+          adoqSpravoch.SQL.Append('WHERE sprav_pokup.id in ('+iid_prod+')');
+          adoqSpravoch.Open;
+        end;
+
+      vsgStatus.Clear;
+      vsgStatus.BeginUpdate;
+      with dmCash do
+      begin
+        //—троим дерево на основе данных из итоговой таблицы
+        while not (adoqSpravoch.EOF) do
+          begin
+            if adoqSpravoch.FieldByName('id_kat').Value = null then
+              begin
+                node := vsgStatus.addChild(NIL);
+              end
+            else
+              begin
+                node1 := vsgStatus.GetFirst();
+                while (node1 <> nil) do
+                  begin
+                    Data := vsgStatus.GetNodeData(node1);
+                    if (Assigned(Data)) and (Data.ID = adoqSpravoch.FieldByName('id_kat').Value) then
+                      begin
+                        node := vsgStatus.addChild(node1);
+                        break;
+                      end;
+                    node1 := vsgStatus.GetNext(node1);
+                  end;
+              end;
+            initNode(node);
+            adoqSpravoch.Next;
+          end;
+      end;
+      vsgStatus.EndUpdate;
+    end;
+end;
+
+procedure TfStatus.vsgStatusNodeClick(Sender: TBaseVirtualTree;
+  const HitInfo: THitInfo);
+var
+  Data: PvtWinfo;
+  index: integer;
+  iid_: string;
+begin
+  if Assigned(vsgStatus.FocusedNode) then
+    Data := vsgStatus.GetNodeData(vsgStatus.FocusedNode);
+  index := fMainCash.id_prod[1].IndexOf(IntToStr(Data.ID));
+  if index <> - 1 then
+    begin
+      iid_ := fMainCash.id_prod[2][index];
+      delete(iid_, 1, 1);
+      iid_ := iid_ + fMainCash.id_prod[1][index];
+      LoadData('WHERE id_prod in(' + iid_ + ') and f_show = false');
     end;
 end;
 
