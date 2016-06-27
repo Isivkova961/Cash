@@ -359,11 +359,14 @@ begin
           else
             iid_prod := iid_prod + ',' + prod_id[i];
         end;
-      adoqSpravoch.SQL.Clear;
-      adoqSpravoch.SQL.Append('SELECT *');
-      adoqSpravoch.SQL.Append('FROM sprav_pokup');
-      adoqSpravoch.SQL.Append('WHERE sprav_pokup.id in ('+iid_prod+')');
-      adoqSpravoch.Open;
+      if iid_prod <> '' then
+        begin
+          adoqSpravoch.SQL.Clear;
+          adoqSpravoch.SQL.Append('SELECT *');
+          adoqSpravoch.SQL.Append('FROM sprav_pokup');
+          adoqSpravoch.SQL.Append('WHERE sprav_pokup.id in ('+iid_prod+')');
+          adoqSpravoch.Open;
+        end;
 
       vsgStatus.Clear;
       vsgStatus.BeginUpdate;

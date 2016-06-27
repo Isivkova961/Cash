@@ -31,9 +31,17 @@ type
     adoqLekar: TADOQuery;
     dsLekar: TDataSource;
     adoqDrevo2: TADOQuery;
+    adoqItog: TADOQuery;
+    dsItog: TDataSource;
+    adoqSpisokBlud: TADOQuery;
+    dsSpisokBlud: TDataSource;
+    adoqBludoPr: TADOQuery;
+    dsBludoPr: TDataSource;
+    adoqAddBludo: TADOQuery;
     procedure adoqLekarAfterInsert(DataSet: TDataSet);
     procedure adoqStatusAfterInsert(DataSet: TDataSet);
     procedure adoqSpisokAfterInsert(DataSet: TDataSet);
+
   private
     { Private declarations }
   public

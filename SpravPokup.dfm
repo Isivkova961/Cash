@@ -14,7 +14,9 @@ object fSprav: TfSprav
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 17
@@ -70,7 +72,7 @@ object fSprav: TfSprav
       Top = 1
       Width = 469
       Height = 337
-      ActivePage = tsDohod
+      ActivePage = tsRashod
       Align = alClient
       HotTrack = True
       TabOrder = 0
@@ -109,7 +111,7 @@ object fSprav: TfSprav
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment]
               Position = 0
-              Width = 457
+              Width = 461
               WideText = #1057#1090#1072#1090#1100#1103' '#1073#1102#1076#1078#1077#1090#1072
             end>
           WideDefaultText = ''
@@ -145,11 +147,12 @@ object fSprav: TfSprav
           TreeOptions.StringOptions = [toAutoAcceptEditChange]
           OnFreeNode = vstRashodFreeNode
           OnGetText = vstRashodGetText
+          OnKeyDown = vstRashodKeyDown
           Columns = <
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment]
               Position = 0
-              Width = 461
+              Width = 457
               WideText = #1057#1090#1072#1090#1100#1103' '#1073#1102#1076#1078#1077#1090#1072
             end>
           WideDefaultText = ''

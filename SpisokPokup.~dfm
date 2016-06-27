@@ -33,7 +33,7 @@ object fSpisokPokup: TfSpisokPokup
       Width = 282
       Height = 305
       Align = alClient
-      AllowedOperations = [alopInsertEh, alopUpdateEh]
+      AllowedOperations = [alopUpdateEh, alopDeleteEh]
       DataSource = dmCash.dsSpisok
       FixedColor = clGradientActiveCaption
       Flat = False

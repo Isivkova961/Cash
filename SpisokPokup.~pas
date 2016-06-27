@@ -61,19 +61,29 @@ end;
 procedure TfSpisokPokup.dbgSpisokKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = 13 then
+  if dmCash.adoqSpisok.RecordCount > 0 then
+    if Key = 13 then
+      begin
+        with dmCash.adoqSpisok do
+          begin
+            Edit;
+            Post;
+          end;
+        if cebOpen.Checked = false then
+          LoadData('WHERE status = false');
+      end;
+  if key = 45 then
     begin
       with dmCash.adoqSpisok do
         begin
-          Edit;
+          Insert;
           Post;
         end;
-      if cebOpen.Checked = false then
-        LoadData('WHERE status = false');
     end;
-  if Key = 46 then
-    if MessageDlg('Вы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
-      dmCash.adoqSpisok.Delete;
+  if dmCash.adoqSpisok.RecordCount > 0 then
+    if Key = 46 then
+      if MessageDlg('Вы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
+        dmCash.adoqSpisok.Delete;
 end;
 
 procedure TfSpisokPokup.cebOpenClick(Sender: TObject);

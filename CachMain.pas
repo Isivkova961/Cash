@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, Menus, ComCtrls, StdCtrls, ToolWin, GridsEh, DBGridEh,
   Spin, ImgList, RXSplit, Gauges, Buttons, VirtualTrees,DateUtils, Grids,
-  DBGrids,ComObj, DB;
+  DBGrids,ComObj, DB, TeEngine, Series, TeeProcs, Chart, DbChart;
 
 type
   TfMainCash = class(TForm)
@@ -46,8 +46,13 @@ type
     sgData: TStringGrid;
     dbgVirtual: TDBGridEh;
     nStatus: TMenuItem;
-    N1: TMenuItem;
+    nPokup: TMenuItem;
     nLekar: TMenuItem;
+    sbLekar: TSpeedButton;
+    sbStatus: TSpeedButton;
+    sbSpisokPokup: TSpeedButton;
+    nBludo: TMenuItem;
+    sbSpisokBlud: TSpeedButton;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: WideString);
@@ -86,8 +91,14 @@ type
     procedure sbSpravClick(Sender: TObject);
     procedure spGodChange(Sender: TObject);
     procedure nStatusClick(Sender: TObject);
-    procedure N1Click(Sender: TObject);
+    procedure nPokupClick(Sender: TObject);
     procedure nLekarClick(Sender: TObject);
+    procedure sbStatusClick(Sender: TObject);
+    procedure sbSpisokPokupClick(Sender: TObject);
+    procedure sbLekarClick(Sender: TObject);
+    procedure TestData;
+    procedure nBludoClick(Sender: TObject);
+    procedure sbSpisokBludClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -115,7 +126,8 @@ var
 
 implementation
 
-uses CashDM, CashDetail, SpravPokup, SpisokPokup, CashStatus, SpisokLekar;
+uses CashDM, CashDetail, SpravPokup, SpisokPokup, CashStatus, SpisokLekar,
+  SpisokBlud;
 
 {$R *.dfm}
 
@@ -430,7 +442,7 @@ begin
   sgData.Cells[3,1] := 'Остаток';
   sgData.Cells[4,1] := 'Сумма';
   sgData.Cells[5,1] := 'Остаток';
-  days := DaysInMonth(StrToDate('01.' + month_ + '.' + spGod.Text));
+  days := DaysInMonth(spGod.Value, StrToInt(month_));
   sgData.RowCount := days + 2;
   DateSeparator := '.';
   ShortDateFormat := 'dd/mm/yyyy';
@@ -490,6 +502,7 @@ begin
   dbgReal.OddRowColor := RGB(254,254,214);
   dbgVirtual.EvenRowColor := RGB(214,254,252);
   dbgVirtual.OddRowColor := RGB(254,254,214);
+  TestData;
 end;
 
 //Отрисовка данных таблицы о суммах
@@ -954,7 +967,7 @@ begin
   fStatus.ShowModal;
 end;
 
-procedure TfMainCash.N1Click(Sender: TObject);
+procedure TfMainCash.nPokupClick(Sender: TObject);
 begin
   fSpisokPokup.ShowModal;
 end;
@@ -962,6 +975,56 @@ end;
 procedure TfMainCash.nLekarClick(Sender: TObject);
 begin
   fSpisokLekar.ShowModal;
+end;
+
+procedure TfMainCash.sbStatusClick(Sender: TObject);
+begin
+  fStatus.ShowModal;  
+end;
+
+procedure TfMainCash.sbSpisokPokupClick(Sender: TObject);
+begin
+  fSpisokPokup.ShowModal;
+end;
+
+procedure TfMainCash.sbLekarClick(Sender: TObject);
+begin
+  fSpisokLekar.ShowModal;
+end;
+
+procedure TfMainCash.TestData;
+var
+  lekar: string;
+begin
+  with dmCash do
+    begin
+      adoqLekar.SQL.Clear;
+      adoqLekar.SQL.Append('SELECT * FROM spisok_lekar');
+      adoqLekar.SQL.Append('WHERE f_show = false and the_end = false');
+      adoqLekar.Open;
+      while not (adoqLekar.Eof) do
+        begin
+          if adoqLekar.FieldByName('date_srok_god').Value <= Date then
+            lekar := lekar + adoqLekar.FieldByName('name_lek').AsString + ' - ' +
+                    adoqLekar.FieldByName('date_srok_god').AsString + #10 + #13;
+          adoqLekar.Next;
+        end;
+      if lekar <> '' then
+        begin
+          lekar := 'Вышел срок годности у следующих лекарств:' + #10 + #13 + lekar;
+          ShowMessage(lekar);
+        end;
+    end;
+end;
+
+procedure TfMainCash.nBludoClick(Sender: TObject);
+begin
+  fSpisokBlud.ShowModal;
+end;
+
+procedure TfMainCash.sbSpisokBludClick(Sender: TObject);
+begin
+  fSpisokBlud.ShowModal;
 end;
 
 end.

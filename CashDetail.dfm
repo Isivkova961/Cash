@@ -91,6 +91,7 @@ object fCashDetail: TfCashDetail
       Top = 48
       Width = 185
       Height = 25
+      Style = csDropDownList
       ItemHeight = 17
       TabOrder = 1
     end
@@ -99,6 +100,7 @@ object fCashDetail: TfCashDetail
       Top = 112
       Width = 185
       Height = 25
+      Style = csDropDownList
       ItemHeight = 17
       TabOrder = 2
     end

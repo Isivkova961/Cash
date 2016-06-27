@@ -2,8 +2,8 @@ object dmCash: TdmCash
   OldCreateOrder = False
   Left = 597
   Top = 211
-  Height = 359
-  Width = 460
+  Height = 390
+  Width = 480
   object adocCash: TADOConnection
     Connected = True
     ConnectionString = 
@@ -172,5 +172,61 @@ object dmCash: TdmCash
     Parameters = <>
     Left = 136
     Top = 264
+  end
+  object adoqItog: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM itog')
+    Left = 16
+    Top = 256
+  end
+  object dsItog: TDataSource
+    DataSet = adoqItog
+    Left = 64
+    Top = 256
+  end
+  object adoqSpisokBlud: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM itog')
+    Left = 328
+    Top = 256
+  end
+  object dsSpisokBlud: TDataSource
+    DataSet = adoqSpisokBlud
+    Left = 376
+    Top = 256
+  end
+  object adoqBludoPr: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT Bludo_pr.*, spisok_blud.name_bludo'
+      'FROM Bludo_pr,spisok_blud'
+      'WHERE Bludo_pr.id_bludo=spisok_blud.id')
+    Left = 328
+    Top = 304
+  end
+  object dsBludoPr: TDataSource
+    DataSet = adoqBludoPr
+    Left = 376
+    Top = 304
+  end
+  object adoqAddBludo: TADOQuery
+    Connection = adocCash
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 256
+    Top = 256
   end
 end

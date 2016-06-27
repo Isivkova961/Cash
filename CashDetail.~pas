@@ -31,6 +31,7 @@ type
     procedure bCancelClick(Sender: TObject);
     procedure NewDetail;
     procedure bOKClick(Sender: TObject);
+    procedure cobKategExit(Sender: TObject);
   private
     { Private declarations }
   public
@@ -43,7 +44,7 @@ var
 
 implementation
 
-uses CashDM, CachMain;
+uses CashDM, CachMain, SpravNE;
 
 {$R *.dfm}
 
@@ -64,6 +65,7 @@ begin
       SQL.Clear;
       SQL.Append('SELECT * FROM sprav_pokup WHERE d_r = true');
       SQL.Append('and id_kat <> null');
+      SQL.Append('ORDER BY name_kat ASC');
       Open;
       DisableControls;
       cobKoshel.Items.BeginUpdate;
@@ -82,6 +84,7 @@ begin
       SQL.Clear;
       SQL.Append('SELECT * FROM sprav_pokup');
       SQL.Append('WHERE id_kat <> null');
+      SQL.Append('ORDER BY d_r, name_kat ASC');
       Open;
       DisableControls;
       cobKateg.Items.BeginUpdate;
@@ -104,6 +107,7 @@ procedure TfCashDetail.FormShow(Sender: TObject);
 begin
   LoadTable;
   NewDetail;
+  ceSumma.SetFocus;
 end;
 
 procedure TfCashDetail.bCancelClick(Sender: TObject);
@@ -121,7 +125,7 @@ begin
     begin
       deDate.Text := fMainCash.Date_data;
       ceSumma.Text := '';
-      cobKateg.ItemIndex := -1;
+      cobKateg.Text := '';
       cobKoshel.ItemIndex := -1;
       eKoment.Text := '';
       eKol.Text := '1';
@@ -132,7 +136,7 @@ begin
         with dmCash.adoqReal do
           begin
             deDate.Text := FieldByName('date_v').AsString;
-            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat));
+            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat / FieldByName('kol').AsInteger));
             dmCash.adoqSprav.Locate('id', FieldByName('id_prod').AsInteger, []);
             if dmCash.adoqSprav.FieldByName('d_r').Value = true then
               cobKateg.ItemIndex := cobKateg.Items.IndexOf('+' + dmCash.adoqSprav.FieldByName('name_kat').AsString)
@@ -146,7 +150,7 @@ begin
         with dmCash.adoqVirtual do
           begin
             deDate.Text := FieldByName('date_v').AsString;
-            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat));
+            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat / FieldByName('kol').AsInteger));
             if dmCash.adoqSprav.FieldByName('d_r').Value = true then
               cobKateg.ItemIndex := cobKateg.Items.IndexOf('+' + dmCash.adoqSprav.FieldByName('name_kat').AsString)
             else
@@ -177,9 +181,9 @@ begin
           adoqDetail.Parameters.ParamByName('i_p').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
           if adoqSprav.Locate('id',integer(cobKateg.Items.Objects[cobKateg.ItemIndex]),[]) then
             if adoqSprav.FieldByName('d_r').Value = true then
-              adoqDetail.Parameters.ParamByName('sm').Value := ceSumma.Value
+              adoqDetail.Parameters.ParamByName('sm').Value := ceSumma.Value * StrToInt(eKol.Text)
             else
-              adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value;
+              adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value * StrToInt(eKol.Text);
           adoqDetail.Parameters.ParamByName('kos').Value := cobKoshel.Text;
           adoqDetail.Parameters.ParamByName('com').Value := eKoment.Text;
           adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
@@ -233,9 +237,9 @@ begin
           adoqDetail.Parameters.ParamByName('i_p').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
           if adoqSprav.Locate('id',integer(cobKateg.Items.Objects[cobKateg.ItemIndex]),[]) then
             if adoqSprav.FieldByName('d_r').Value = true then
-              adoqDetail.Parameters.ParamByName('sm').Value := ceSumma.Value
+              adoqDetail.Parameters.ParamByName('sm').Value := ceSumma.Value * StrToInt(eKol.Text)
             else
-              adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value;
+              adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value * StrToInt(eKol.Text);
           adoqDetail.Parameters.ParamByName('kos').Value := cobKoshel.Text;
           adoqDetail.Parameters.ParamByName('com').Value := eKoment.Text;
           if fMainCash.bReal_Virt = true then
@@ -281,6 +285,17 @@ begin
   fMainCash.OutData;
   fMainCash.SummaDate;
   Close;
+end;
+
+procedure TfCashDetail.cobKategExit(Sender: TObject);
+begin
+  if cobKateg.Items.IndexOf(cobKateg.Text) = - 1 then
+    begin
+      if MessageDlg('Данной категории нет в справочнике.' + #10 + #13 + ' Добавить?', mtWarning, mbOkCancel, 0) = mrOk then
+        fSpravNE.ShowModal
+      else
+        cobKateg.Text := '';
+    end;
 end;
 
 end.

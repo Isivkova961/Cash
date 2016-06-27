@@ -43,7 +43,7 @@ var
 
 implementation
 
-uses CashDM, CachMain;
+uses CashDM, CachMain, SpravNE;
 
 {$R *.dfm}
 
@@ -124,7 +124,7 @@ begin
     begin
       deDate.Text := fMainCash.Date_data;
       ceSumma.Text := '';
-      cobKateg.ItemIndex := -1;
+      cobKateg.Text := '';
       cobKoshel.ItemIndex := -1;
       eKoment.Text := '';
       eKol.Text := '1';
@@ -135,7 +135,7 @@ begin
         with dmCash.adoqReal do
           begin
             deDate.Text := FieldByName('date_v').AsString;
-            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat));
+            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat / FieldByName('kol').AsInteger));
             dmCash.adoqSprav.Locate('id', FieldByName('id_prod').AsInteger, []);
             if dmCash.adoqSprav.FieldByName('d_r').Value = true then
               cobKateg.ItemIndex := cobKateg.Items.IndexOf('+' + dmCash.adoqSprav.FieldByName('name_kat').AsString)
@@ -149,7 +149,7 @@ begin
         with dmCash.adoqVirtual do
           begin
             deDate.Text := FieldByName('date_v').AsString;
-            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat));
+            ceSumma.Text := FloatToStr(Abs(FieldByName('sum_d').AsFloat / FieldByName('kol').AsInteger));
             if dmCash.adoqSprav.FieldByName('d_r').Value = true then
               cobKateg.ItemIndex := cobKateg.Items.IndexOf('+' + dmCash.adoqSprav.FieldByName('name_kat').AsString)
             else
@@ -180,9 +180,9 @@ begin
           adoqDetail.Parameters.ParamByName('i_p').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
           if adoqSprav.Locate('id',integer(cobKateg.Items.Objects[cobKateg.ItemIndex]),[]) then
             if adoqSprav.FieldByName('d_r').Value = true then
-              adoqDetail.Parameters.ParamByName('sm').Value := ceSumma.Value
+              adoqDetail.Parameters.ParamByName('sm').Value := ceSumma.Value * StrToInt(eKol.Text)
             else
-              adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value;
+              adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value * StrToInt(eKol.Text);
           adoqDetail.Parameters.ParamByName('kos').Value := cobKoshel.Text;
           adoqDetail.Parameters.ParamByName('com').Value := eKoment.Text;
           adoqDetail.Parameters.ParamByName('kl').Value := eKol.Text;
@@ -236,9 +236,9 @@ begin
           adoqDetail.Parameters.ParamByName('i_p').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
           if adoqSprav.Locate('id',integer(cobKateg.Items.Objects[cobKateg.ItemIndex]),[]) then
             if adoqSprav.FieldByName('d_r').Value = true then
-              adoqDetail.Parameters.ParamByName('sm').Value := ceSumma.Value
+              adoqDetail.Parameters.ParamByName('sm').Value := ceSumma.Value * StrToInt(eKol.Text)
             else
-              adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value;
+              adoqDetail.Parameters.ParamByName('sm').Value := - ceSumma.Value * StrToInt(eKol.Text);
           adoqDetail.Parameters.ParamByName('kos').Value := cobKoshel.Text;
           adoqDetail.Parameters.ParamByName('com').Value := eKoment.Text;
           if fMainCash.bReal_Virt = true then

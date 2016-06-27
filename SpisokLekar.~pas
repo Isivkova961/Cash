@@ -125,22 +125,22 @@ end;
 procedure TfSpisokLekar.dbgLekarKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  
-  if Key = 13 then
-    begin
-      dbgLekar.Options := dbgLekar.Options - [dgRowSelect];
-      dbgLekar.Options := dbgLekar.Options + [dgEditing];
-      dbgLekar.ReadOnly := false;
-      with dmCash.adoqLekar do
-        begin
-          Edit;
-          Post;
-          if dbgLekar.SelectedIndex = 6 then
-            begin
-              LoadData('WHERE f_show = false');
-            end;
-        end;
-    end;
+  if dmCash.adoqLekar.RecordCount > 0 then
+    if Key = 13 then
+      begin
+        dbgLekar.Options := dbgLekar.Options - [dgRowSelect];
+        dbgLekar.Options := dbgLekar.Options + [dgEditing];
+        dbgLekar.ReadOnly := false;
+        with dmCash.adoqLekar do
+          begin
+            Edit;
+            Post;
+            if dbgLekar.SelectedIndex = 6 then
+              begin
+                LoadData('WHERE f_show = false');
+              end;
+          end;
+      end;
   if Key = 45 then
     begin
       dbgLekar.Options := dbgLekar.Options - [dgRowSelect];

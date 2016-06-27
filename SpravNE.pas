@@ -46,6 +46,7 @@ procedure TfSpravNE.FormShow(Sender: TObject);
 begin
   LoadTable;
   NewEditData;
+  cobKateg.SetFocus;
 end;
 
 procedure TfSpravNE.LoadTable;
@@ -55,11 +56,13 @@ begin
       adoqDohod.SQL.Clear;
       adoqDohod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqDohod.SQL.Append('WHERE d_r = true');
+      adoqDohod.SQL.Append('ORDER BY name_kat ASC');
       adoqDohod.Open;
 
       adoqRashod.SQL.Clear;
       adoqRashod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqRashod.SQL.Append('WHERE d_r = false');
+      adoqRashod.SQL.Append('ORDER BY name_kat ASC');
       adoqRashod.Open;
     end;
   cobKateg.Clear;
@@ -167,18 +170,9 @@ begin
     end;
   if fSprav.bNew_Edit = true then
     begin
-      if dmCash.adoqSprav.Locate('id', fSprav.iid_sp,[]) then
-        begin
-          cobKateg.ItemIndex := cobKateg.Items.IndexOf(dmCash.adoqSprav.FieldByName('name_kat').AsString);
-          cebMed.Checked := dmCash.adoqSprav.FieldByName('lek').Value;
-        end
-      else
-        begin
-          cobKateg.ItemIndex := - 1;
-          cebMed.Checked := false;
-        end;
+      cobKateg.ItemIndex := - 1;
+      cebMed.Checked := false;
       eName.Text := '';
-
     end
   else
     begin
@@ -209,7 +203,9 @@ procedure TfSpravNE.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if key = 13 then
-    bSave.Click;  
+    bSave.Click;
+  if Key = 27 then
+    Close;
 end;
 
 end.

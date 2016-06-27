@@ -49,6 +49,11 @@ type
       Shift: TShiftState);
     procedure ButEnabled;
     procedure VivodKat;
+    procedure vstRashodKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -74,7 +79,7 @@ var
 
 implementation
 
-uses CashDM, SpravNE;
+uses CashDM, SpravNE, CachMain;
 
 {$R *.dfm}
 
@@ -471,5 +476,30 @@ begin
     end;
 end;
 
+
+procedure TfSprav.vstRashodKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 45 then
+    tbNew.Click;
+  if Key = 13 then
+    if tbEdit.Enabled then
+      tbEdit.Click;
+  if Key = 46 then
+    if tbDelete.Enabled then
+      tbDelete.Click;
+end;
+
+procedure TfSprav.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 27 then
+    Close;
+end;
+
+procedure TfSprav.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  fMainCash.VivodKat;
+end;
 
 end.

@@ -17,6 +17,7 @@ object fSpisokLekar: TfSpisokLekar
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 17
