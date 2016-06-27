@@ -52,6 +52,9 @@ uses CashDM, CachMain, SpisokBlud;
 procedure TfBluda.FormShow(Sender: TObject);
 begin
   LoadData;
+  clbSpisokProd.Clear;
+  eNameBludo.Text := '';
+  eProd.Text := '';
 end;
 
 procedure TfBluda.LoadData;
@@ -125,49 +128,52 @@ end;
 
 procedure TfBluda.sbNewClick(Sender: TObject);
 var
-  i, index: integer;
+  index: integer;
   prod: string;
 begin
-  index := lbNameBludo.Items.IndexOf(eNameBludo.Text);
-  if index < 0 then
+  if (eNameBludo.Text <> '')  and (eProd.Text <> '') then
     begin
-      if MessageDlg('Добавить новое блюдо?', mtWarning, mbOkCancel, 0) = mrOk then
+      index := lbNameBludo.Items.IndexOf(eNameBludo.Text);
+      if index < 0 then
         begin
-          with dmCash do
+          if MessageDlg('Добавить новое блюдо?', mtWarning, mbOkCancel, 0) = mrOk then
             begin
-              adoqAddBludo.SQL.Clear;
-              adoqAddBludo.SQL.Append('INSERT INTO spisok_blud');
-              adoqAddBludo.SQL.Append('(name_bludo, spisok_prod)');
-              adoqAddBludo.SQL.Append('VALUES (:n_b, :s_p)');
-              adoqAddBludo.Parameters.ParamByName('n_b').Value := eNameBludo.Text;
-              if eProd.Text <> '' then
-                adoqAddBludo.Parameters.ParamByName('s_p').Value := eProd.Text
-              else
-                adoqAddBludo.Parameters.ParamByName('s_p').Value := null;
-              adoqAddBludo.ExecSQL;
+              with dmCash do
+                begin
+                  adoqAddBludo.SQL.Clear;
+                  adoqAddBludo.SQL.Append('INSERT INTO spisok_blud');
+                  adoqAddBludo.SQL.Append('(name_bludo, spisok_prod)');
+                  adoqAddBludo.SQL.Append('VALUES (:n_b, :s_p)');
+                  adoqAddBludo.Parameters.ParamByName('n_b').Value := eNameBludo.Text;
+                  if eProd.Text <> '' then
+                    adoqAddBludo.Parameters.ParamByName('s_p').Value := eProd.Text
+                  else
+                    adoqAddBludo.Parameters.ParamByName('s_p').Value := null;
+                  adoqAddBludo.ExecSQL;
+                end;
             end;
+        end
+      else
+        begin
+          if (clbSpisokProd.Items.IndexOf(eProd.Text) < 0) and (eProd.Text <> '') then
+            with dmCash do
+              begin
+                adoqAddBludo.SQL.Clear;
+                adoqAddBludo.SQL.Append('UPDATE spisok_blud');
+                adoqAddBludo.SQL.Append('SET spisok_prod = :s_p');
+                adoqAddBludo.SQL.Append('WHERE id = :iid');
+                adoqAddBludo.Parameters.ParamByName('iid').Value := integer(lbNameBludo.Items.Objects[index]);
+                if adoqSpisokBlud.Locate('id', integer(lbNameBludo.Items.Objects[index]), []) then
+                  prod := adoqSpisokBlud.FieldByName('spisok_prod').AsString + ',' + eProd.Text;
+                adoqAddBludo.Parameters.ParamByName('s_p').Value := prod;
+                adoqAddBludo.ExecSQL;
+                if lbNameBludo.ItemIndex = index then
+                  clbSpisokProd.Items.Append(eProd.Text);
+              end;
         end;
-    end
-  else
-    begin
-      if (clbSpisokProd.Items.IndexOf(eProd.Text) < 0) and (eProd.Text <> '') then
-        with dmCash do
-          begin
-            adoqAddBludo.SQL.Clear;
-            adoqAddBludo.SQL.Append('UPDATE spisok_blud');
-            adoqAddBludo.SQL.Append('SET spisok_prod = :s_p');
-            adoqAddBludo.SQL.Append('WHERE id = :iid');
-            adoqAddBludo.Parameters.ParamByName('iid').Value := integer(lbNameBludo.Items.Objects[index]);
-            for i := 0 to clbSpisokProd.Items.Count - 1 do
-              prod := prod + clbSpisokProd.Items[i] + ',';
-            prod := prod + eProd.Text;
-            adoqAddBludo.Parameters.ParamByName('s_p').Value := prod;
-            adoqAddBludo.ExecSQL;
-            clbSpisokProd.Items.Append(eProd.Text);
-          end;
-    end;
-  LoadData;
-  eProd.Text := '';
+      LoadData;
+      eProd.Text := '';
+  end;
 end;
 
 procedure TfBluda.lbNameBludoKeyDown(Sender: TObject; var Key: Word;

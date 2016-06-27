@@ -2,7 +2,7 @@ object dmCash: TdmCash
   OldCreateOrder = False
   Left = 597
   Top = 211
-  Height = 390
+  Height = 531
   Width = 480
   object adocCash: TADOConnection
     Connected = True
@@ -228,5 +228,42 @@ object dmCash: TdmCash
       '')
     Left = 256
     Top = 256
+  end
+  object adoqRealD: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT name_kat,real_sum'
+      'FROm itog'
+      'WHERE real_sum < 0 and id_kat is null')
+    Left = 16
+    Top = 360
+  end
+  object adoqVirtualD: TADOQuery
+    Connection = adocCash
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT name_kat,virtual_sum'
+      'FROm itog'
+      'WHERE virtual_sum < 0 and id_kat is null')
+    Left = 16
+    Top = 320
+  end
+  object dsVirtualD: TDataSource
+    DataSet = adoqVirtualD
+    Left = 64
+    Top = 320
+  end
+  object adoqOtchet: TADOQuery
+    Connection = adocCash
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 16
+    Top = 408
   end
 end

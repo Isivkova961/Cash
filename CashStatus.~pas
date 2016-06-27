@@ -47,6 +47,8 @@ type
     procedure LoadDrevo;
     procedure vsgStatusNodeClick(Sender: TBaseVirtualTree;
       const HitInfo: THitInfo);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
 
   private
     { Private declarations }
@@ -418,6 +420,13 @@ begin
       iid_ := iid_ + fMainCash.id_prod[1][index];
       LoadData('WHERE id_prod in(' + iid_ + ') and f_show = false');
     end;
+end;
+
+procedure TfStatus.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 27 then
+    Close;
 end;
 
 end.

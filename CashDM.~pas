@@ -37,6 +37,10 @@ type
     dsSpisokBlud: TDataSource;
     adoqBludoPr: TADOQuery;
     dsBludoPr: TDataSource;
+    adoqAddBludo: TADOQuery;
+    adoqRealD: TADOQuery;
+    adoqVirtualD: TADOQuery;
+    dsVirtualD: TDataSource;
     procedure adoqLekarAfterInsert(DataSet: TDataSet);
     procedure adoqStatusAfterInsert(DataSet: TDataSet);
     procedure adoqSpisokAfterInsert(DataSet: TDataSet);

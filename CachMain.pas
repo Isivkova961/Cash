@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, Menus, ComCtrls, StdCtrls, ToolWin, GridsEh, DBGridEh,
   Spin, ImgList, RXSplit, Gauges, Buttons, VirtualTrees,DateUtils, Grids,
-  DBGrids,ComObj, DB, TeEngine, Series, TeeProcs, Chart, DbChart;
+  DBGrids, ComObj, DB, TeEngine, Series, TeeProcs, Chart, DbChart;
 
 type
   TfMainCash = class(TForm)
@@ -53,6 +53,15 @@ type
     sbSpisokPokup: TSpeedButton;
     nBludo: TMenuItem;
     sbSpisokBlud: TSpeedButton;
+    cVirtual: TDBChart;
+    Series1: TPieSeries;
+    DBChart1: TDBChart;
+    Series2: TPieSeries;
+    nOtchet: TMenuItem;
+    nMonthV: TMenuItem;
+    nMonthR: TMenuItem;
+    nViewSpisok: TMenuItem;
+    nOtchetKoshel: TMenuItem;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: WideString);
@@ -99,6 +108,12 @@ type
     procedure TestData;
     procedure nBludoClick(Sender: TObject);
     procedure sbSpisokBludClick(Sender: TObject);
+    procedure LoadDiagram;
+    procedure nMonthVClick(Sender: TObject);
+    procedure VivodExcel(str: string);
+    procedure nMonthRClick(Sender: TObject);
+    procedure nOtchetKoshelClick(Sender: TObject);
+    procedure ExcelOthet;
   private
     { Private declarations }
   public
@@ -194,12 +209,8 @@ end;
 //создание дерева
 procedure TfMainCash.VivodData;
 var
-  i: Byte;
   node,node1: PVirtualNode;
   Data: PvtWinfo;
-  iid: array of integer;
-  index: integer;
-  Access: Variant;
 
   //Запись в таблицы данных по категориям и присвоения высшим категориям сумм из низших категорий
   procedure VivodTableKat;
@@ -431,7 +442,7 @@ end;
 procedure TfMainCash.LoadData;
 var
   days, WD: integer;
-  i, j: integer;
+  i: integer;
   dw, month_: string;
 begin
   month_ := cobMonth.Text;
@@ -503,6 +514,7 @@ begin
   dbgVirtual.EvenRowColor := RGB(214,254,252);
   dbgVirtual.OddRowColor := RGB(254,254,214);
   TestData;
+  LoadDiagram;
 end;
 
 //Отрисовка данных таблицы о суммах
@@ -1025,6 +1037,212 @@ end;
 procedure TfMainCash.sbSpisokBludClick(Sender: TObject);
 begin
   fSpisokBlud.ShowModal;
+end;
+
+//Процедура загрузки данных в диаграмму
+procedure TfMainCash.LoadDiagram;
+const
+  clColor : array [1..17] of TColor = (clRed, clBlue, clGreen, clYellow, clMoneyGreen, clLime, clAqua, clFuchsia,
+                                      clBlack, clMaroon, clOlive, clNavy, clPurple, clTeal, clGray, clSilver, clSkyBlue);
+var
+  i: integer;
+begin
+  with dmCash do
+    begin
+      adoqVirtualD.SQL.Clear;
+      adoqVirtualD.SQL.Append('SELECT name_kat, virtual_sum FROM itog');
+      adoqVirtualD.SQL.Append('WHERE virtual_sum < 0 and id_kat is null');
+      adoqVirtualD.Open;
+      adoqVirtualD.Active := true;
+      Series1.Clear;
+      i := 1;
+      while not (adoqVirtualD.Eof) do
+        begin
+          Series1.Add(- adoqVirtualD.FieldByName('virtual_sum').Value, adoqVirtualD.FieldByName('name_kat').AsString, clColor[i]);
+          adoqVirtualD.Next;
+          inc(i);
+        end;
+      adoqRealD.SQL.Clear;
+      adoqRealD.SQL.Append('SELECT name_kat, real_sum FROM itog');
+      adoqRealD.SQL.Append('WHERE real_sum < 0 and id_kat is null');
+      adoqRealD.Open;
+      adoqRealD.Active := true;
+      Series2.Clear;
+      i := 1;
+      while not (adoqRealD.Eof) do
+        begin
+          Series2.Add(- adoqRealD.FieldByName('real_sum').Value, adoqRealD.FieldByName('name_kat').AsString, clColor[i]);
+          adoqRealD.Next;
+          inc(i);
+        end;
+    end;
+end;
+
+procedure TfMainCash.nMonthVClick(Sender: TObject);
+begin
+  with dmCash do
+    begin
+      adoqOtchet.SQL.Clear;
+      adoqOtchet.SQL.Append('SELECT virtual_pokup.*, name_kat FROM virtual_pokup, sprav_pokup');
+      adoqOtchet.SQL.Append('WHERE month_v = :m_v and sprav_pokup.id = virtual_pokup.id_prod');
+      adoqOtchet.SQL.Append('ORDER BY date_v ASC');
+      adoqOtchet.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
+      adoqOtchet.Open;
+    end;
+  VivodExcel('Прогнозы за ');
+end;
+
+procedure TfMainCash.VivodExcel(str: string);
+var
+    XLApp, Sheet, Colum: Variant;
+    index: Integer;
+begin
+  XLApp:=CreateOleObject('Excel.Application');
+  XLApp.Visible := false;
+  XLApp.Workbooks.Add(-4167);
+  XLApp.Workbooks[1].WorkSheets[1].Name := str + cobMonth.Text + ' ' + spGod.Text;
+  Colum := XLApp.Workbooks[1].WorkSheets[1].Columns;
+  Colum.Columns[1].ColumnWidth := 9;
+  Colum.Columns[2].ColumnWidth := 15;
+  Colum.Columns[3].ColumnWidth := 11.29;
+  Colum.Columns[4].ColumnWidth := 11.29;
+  Colum.Columns[5].ColumnWidth := 11.29;
+  Colum.Columns[6].ColumnWidth := 11.29;
+  Sheet:=XLApp.Workbooks[1].WorkSheets[1];
+  XLApp.Selection.WrapText := true;
+  Sheet.Cells[1, 1]:='Дата';
+  Sheet.Cells[1, 2]:='Наименование';
+  Sheet.Cells[1, 3]:='Количество';
+  Sheet.Cells[1, 4]:='Сумма';
+  Sheet.Cells[1, 5]:='Кошелек';
+  Sheet.Cells[1, 6]:='Комментарий';
+  index:=2;
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 6]].Select;
+  XLApp.Selection.WrapText := true;
+  XLApp.Selection.HorizontalAlignment := - 4108;
+  XLApp.Selection.Font.Bold := true;
+
+  with dmCash do
+    begin
+      adoqOtchet.First;
+      while not (adoqOtchet.Eof) do
+        begin
+          Sheet.Cells[index,1] := adoqOtchet.FieldByName('date_v').AsString;
+          Sheet.Cells[index,2] := adoqOtchet.FieldByName('name_kat').AsString;
+          Sheet.Cells[index,3] := adoqOtchet.FieldByName('kol').AsString;
+          Sheet.Cells[index,4] := adoqOtchet.FieldByName('sum_d').AsString;
+          Sheet.Cells[index,5] := adoqOtchet.FieldByName('koshel').AsString;
+          Sheet.Cells[index,6] := adoqOtchet.FieldByName('comment').AsString;
+          adoqOtchet.Next;
+          inc(index);
+        end;
+    end;
+
+  Sheet.Cells[index, 3] := 'ИТОГО:';
+  Sheet.Cells[index, 4].Formula := '=sum(D2:D' + IntToStr(index - 1) + ')';
+  XLApp.Range[XLApp.Cells[index, 1], XLApp.Cells[index, 3]].Select;
+  XLApp.Selection.Merge;
+  XLApp.Selection.HorizontalAlignment := -4152;
+  inc(index);
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[index-1, 6]].Select;
+  XLApp.Selection.Borders.LineStyle := 1;
+  XLApp.Selection.Borders.Weight := 2;
+  XLApp.Selection.WrapText := true;
+  XLApp.Selection.Font.Size := 10;
+  XLApp.Selection.Font.Name := 'Times New Roman';
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.Orientation := 1;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.LeftMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.RightMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.TopMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.BottomMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.HeaderMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.FooterMargin := 15;
+
+  ShowMessage('Отчет готов!');
+  XLApp.Visible := true;
+end;
+
+procedure TfMainCash.nMonthRClick(Sender: TObject);
+begin
+  with dmCash do
+    begin
+      adoqOtchet.SQL.Clear;
+      adoqOtchet.SQL.Append('SELECT real_pokup.*, name_kat FROM real_pokup, sprav_pokup');
+      adoqOtchet.SQL.Append('WHERE month_v = :m_v and sprav_pokup.id = real_pokup.id_prod');
+      adoqOtchet.SQL.Append('ORDER BY date_v ASC');
+      adoqOtchet.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
+      adoqOtchet.Open;
+    end;
+  VivodExcel('Расходы за ');
+end;
+
+procedure TfMainCash.nOtchetKoshelClick(Sender: TObject);
+begin
+  with dmCash do
+    begin
+      adoqOtchet.SQL.Clear;
+      adoqOtchet.SQL.Text := 'SELECT koshel, sum(sum_d) as Summa ' +
+                              'FROM real_pokup WHERE sum_d < 0 ' +
+                              'AND month_v = :m_v ' +
+                              'GROUP BY koshel';
+      adoqOtchet.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
+      adoqOtchet.Open;
+    end;
+  ExcelOthet;
+end;
+
+procedure TfMainCash.ExcelOthet;
+var
+    XLApp, Sheet, Colum: Variant;
+    index: Integer;
+begin
+  XLApp:=CreateOleObject('Excel.Application');
+  XLApp.Visible := false;
+  XLApp.Workbooks.Add(-4167);
+  XLApp.Workbooks[1].WorkSheets[1].Name := 'Данные за ' + cobMonth.Text + ' ' + spGod.Text;
+  Colum := XLApp.Workbooks[1].WorkSheets[1].Columns;
+  Colum.Columns[1].ColumnWidth := 15;
+  Colum.Columns[2].ColumnWidth := 9;
+  Sheet:=XLApp.Workbooks[1].WorkSheets[1];
+  XLApp.Selection.WrapText := true;
+  Sheet.Cells[1, 1]:='Кошелек';
+  Sheet.Cells[1, 2]:='Сумма';
+  index:=2;
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 2]].Select;
+  XLApp.Selection.WrapText := true;
+  XLApp.Selection.HorizontalAlignment := - 4108;
+  XLApp.Selection.Font.Bold := true;
+
+  with dmCash do
+    begin
+      adoqOtchet.First;
+      while not (adoqOtchet.Eof) do
+        begin
+          Sheet.Cells[index,1] := adoqOtchet.FieldByName('koshel').AsString;
+          Sheet.Cells[index,2] := adoqOtchet.FieldByName('summa').AsString;
+          adoqOtchet.Next;
+          inc(index);
+        end;
+    end;
+
+  Sheet.Cells[index, 1] := 'ИТОГО:';
+  Sheet.Cells[index, 2].Formula := '=sum(B2:B' + IntToStr(index - 1) + ')';
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[index, 2]].Select;
+  XLApp.Selection.Borders.LineStyle := 1;
+  XLApp.Selection.Borders.Weight := 2;
+  XLApp.Selection.WrapText := true;
+  XLApp.Selection.Font.Size := 10;
+  XLApp.Selection.Font.Name := 'Times New Roman';
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.Orientation := 1;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.LeftMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.RightMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.TopMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.BottomMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.HeaderMargin := 15;
+  XLApp.WorkBooks[1].WorkSheets[1].PageSetup.FooterMargin := 15;
+
+  ShowMessage('Отчет готов!');
+  XLApp.Visible := true;
 end;
 
 end.

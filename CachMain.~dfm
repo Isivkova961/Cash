@@ -218,6 +218,44 @@ object fMainCash: TfMainCash
         D7EBAED4EAA7D0E77DADCF8CB9D7A9CCE2A4A8AC9FA0A3E7E7E8}
       OnClick = sbSpisokPokupClick
     end
+    object sbSpisokBlud: TSpeedButton
+      Left = 688
+      Top = 1
+      Width = 153
+      Height = 24
+      Hint = #1057#1087#1080#1089#1086#1082' '#1083#1077#1082#1072#1088#1089#1090#1074
+      Anchors = [akTop, akRight, akBottom]
+      Caption = #1057#1087#1080#1089#1086#1082' '#1073#1083#1102#1076
+      Flat = True
+      Glyph.Data = {
+        36030000424D3603000000000000360000002800000010000000100000000100
+        1800000000000003000000000000000000000000000000000000F2F2F2DEDEDE
+        D5D5D5D0D0D0CCCCCCCBCBCBC7C7C7C6C6C6C6C6C6C7C7C7CBCBCBCCCCCCD0D0
+        D0D5D5D5DEDEDEF2F2F2F9F9F9EFEFEFD4D8DD59779956759754729554729554
+        7295547295547295547295567596557496C3CBD4EFEFEFF9F9F9FFFFFFFFFFFF
+        BCCBDB95A9BEE1E1E1E0E0E0DEDEDEDCDCDCD9D9D9D7D7D7D5D5D5D2D2D2A1AF
+        BD9DB3CAFFFFFFFFFFFFFFFFFFFFFFFFBACBDBA3B5C7E4E4E4E2E2E2E0E0E0DE
+        DEDEDCDCDCDADADAD8D8D8D5D5D5B0BBC59EB5CCFFFFFFFFFFFFFFFFFFFFFFFF
+        BACCDCA5B8CAE4E4E4EBEBEBDFDFDFD6D6D6D3D3D3D2D2D2D0D0D0D6D6D6B2BE
+        C89EB6CEFFFFFFFFFFFFFFFFFFFFFFFFBACDDDA6BACCE6E6E6E6E6E6E2E2E2E3
+        E3E3E1E1E1DFDFDFDDDDDDDBDBDBB5C1CB9EB8CFFFFFFFFFFFFFFFFFFFFFFFFF
+        BBCEDFA7BCCEE8E8E8E1E1E1E5E5E5E5E5E5E3E3E3E1E1E1DFDFDFDEDEDEB7C4
+        CE9EBAD2FFFFFFFFFFFFFFFFFFFFFFFFBBD0E0A8BFD1E8E8E89595F19D9DECDA
+        DADAD7D7D7D6D6D6D5D5D5DDDDDDB9C7D19EBCD3FFFFFFFFFFFFFFFFFFFFFFFF
+        BBD1E2A8C0D3EBEBEBE8E8E99595EFD5D5EAE7E7E7E5E5E5E4E4E4E2E2E2BBC9
+        D49EBDD5FFFFFFFFFFFFFFFFFFFFFFFFBBD2E3A9C2D5EBEBEBD4D4E9DBDBE9DE
+        DEDEDBDBDBDADADAD9D9D9E2E2E2BDCCD79EBFD7FFFFFFFFFFFFFFFFFFFFFFFF
+        BBD3E4A9C4D6EBEBEBA3A3EB7676F1E1E1E8E6E6E6E5E5E5E4E4E4E5E5E5BECE
+        D99EC1D9FFFFFFFFFFFFFFFFFFFFFFFFBBD5E5A9C5D7EDEDEDEDEDEDCDCDEEDF
+        DFECEBEBEBEAEAEAE9E9E9E8E8E8C0D0DB9EC3DBFFFFFFFFFFFFFFFFFFFFFFFF
+        BED8E885B2CFCBDAE362AFE062AFE062AFE062AEE062AEE061AEDFB3CEE096BB
+        D2A2C6DEFFFFFFFFFFFFFFFFFFFFFFFFEEF5F986B8D681B5D4008EE1008EE124
+        9DE431A2E5008EE1008EE168ADD783B5D5DFECF4FFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFF91D5F665C6F48ED4F6B4E2F853BFF281CFF5F4FBFEFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF9FDFE53
+        CCF942C7F8ECF9FEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+      OnClick = sbSpisokBludClick
+    end
     object cobMonth: TComboBox
       Left = 0
       Top = 0
@@ -336,8 +374,82 @@ object fMainCash: TfMainCash
         end
       end
       object tsDiagram: TTabSheet
-        Caption = #1044#1080#1072#1075#1088#1072#1084#1084#1072
+        Caption = #1044#1080#1072#1075#1088#1072#1084#1084#1099
         ImageIndex = 1
+        object cVirtual: TDBChart
+          Left = 0
+          Top = 0
+          Width = 230
+          Height = 230
+          AllowPanning = pmNone
+          AllowZoom = False
+          BackWall.Brush.Color = clWhite
+          BackWall.Brush.Style = bsClear
+          BackWall.Pen.Visible = False
+          Title.Text.Strings = (
+            #1044#1072#1085#1085#1099#1077' '#1087#1086' '#1087#1088#1086#1075#1085#1086#1079#1072#1084)
+          AxisVisible = False
+          ClipPoints = False
+          Frame.Visible = False
+          LeftAxis.Title.Caption = #1047#1072#1075#1086#1083#1086#1074#1086#1082
+          Legend.Alignment = laBottom
+          RightAxis.LabelStyle = talText
+          View3DOptions.Elevation = 315
+          View3DOptions.Orthogonal = False
+          View3DOptions.Perspective = 0
+          View3DOptions.Rotation = 360
+          View3DWalls = False
+          Color = clGradientInactiveCaption
+          TabOrder = 0
+          object Series1: TPieSeries
+            Marks.ArrowLength = 8
+            Marks.Style = smsPercent
+            Marks.Visible = True
+            DataSource = dmCash.adoqVirtualD
+            SeriesColor = clRed
+            OtherSlice.Text = 'Other'
+            PieValues.DateTime = False
+            PieValues.Name = 'Pie'
+            PieValues.Multiplier = 1.000000000000000000
+            PieValues.Order = loNone
+          end
+        end
+        object DBChart1: TDBChart
+          Left = 0
+          Top = 248
+          Width = 230
+          Height = 230
+          AllowPanning = pmNone
+          AllowZoom = False
+          BackWall.Brush.Color = clWhite
+          BackWall.Brush.Style = bsClear
+          BackWall.Pen.Visible = False
+          Title.Text.Strings = (
+            #1044#1072#1085#1085#1099#1077' '#1087#1086' '#1088#1072#1089#1093#1086#1076#1072#1084)
+          AxisVisible = False
+          ClipPoints = False
+          Frame.Visible = False
+          Legend.Alignment = laBottom
+          View3DOptions.Elevation = 315
+          View3DOptions.Orthogonal = False
+          View3DOptions.Perspective = 0
+          View3DOptions.Rotation = 360
+          View3DWalls = False
+          Color = clGradientInactiveCaption
+          TabOrder = 1
+          object Series2: TPieSeries
+            Marks.ArrowLength = 8
+            Marks.Style = smsPercent
+            Marks.Visible = True
+            DataSource = dmCash.adoqRealD
+            SeriesColor = clRed
+            OtherSlice.Text = 'Other'
+            PieValues.DateTime = False
+            PieValues.Name = 'Pie'
+            PieValues.Multiplier = 1.000000000000000000
+            PieValues.Order = loNone
+          end
+        end
       end
     end
   end
@@ -717,21 +829,39 @@ object fMainCash: TfMainCash
     object nFile: TMenuItem
       Caption = #1060#1072#1081#1083
     end
-    object nStatus: TMenuItem
-      Caption = #1055#1086#1082#1091#1087#1082#1080' '#1074' '#1085#1072#1083#1080#1095#1080#1080
-      OnClick = nStatusClick
+    object nViewSpisok: TMenuItem
+      Caption = #1055#1088#1086#1089#1084#1086#1090#1088' '#1089#1087#1080#1089#1082#1086#1074
+      object nStatus: TMenuItem
+        Caption = #1055#1086#1082#1091#1087#1082#1080' '#1074' '#1085#1072#1083#1080#1095#1080#1080
+        OnClick = nStatusClick
+      end
+      object nPokup: TMenuItem
+        Caption = #1057#1087#1080#1089#1086#1082' '#1087#1086#1082#1091#1087#1086#1082
+        OnClick = nPokupClick
+      end
+      object nLekar: TMenuItem
+        Caption = #1057#1087#1080#1089#1086#1082' '#1083#1077#1082#1072#1088#1089#1090#1074
+        OnClick = nLekarClick
+      end
+      object nBludo: TMenuItem
+        Caption = #1057#1087#1080#1089#1086#1082' '#1073#1083#1102#1076
+        OnClick = nBludoClick
+      end
     end
-    object nPokup: TMenuItem
-      Caption = #1057#1087#1080#1089#1086#1082' '#1087#1086#1082#1091#1087#1086#1082
-      OnClick = nPokupClick
-    end
-    object nLekar: TMenuItem
-      Caption = #1057#1087#1080#1089#1086#1082' '#1083#1077#1082#1072#1088#1089#1090#1074
-      OnClick = nLekarClick
-    end
-    object nBludo: TMenuItem
-      Caption = #1057#1087#1080#1089#1086#1082' '#1073#1083#1102#1076
-      OnClick = nBludoClick
+    object nOtchet: TMenuItem
+      Caption = #1054#1090#1095#1077#1090#1099
+      object nMonthV: TMenuItem
+        Caption = #1055#1088#1086#1075#1085#1086#1079#1099' '#1079#1072' '#1084#1077#1089#1103#1094
+        OnClick = nMonthVClick
+      end
+      object nMonthR: TMenuItem
+        Caption = #1056#1072#1089#1093#1086#1076#1099' '#1079#1072' '#1084#1077#1089#1103#1094
+        OnClick = nMonthRClick
+      end
+      object nOtchetKoshel: TMenuItem
+        Caption = #1056#1072#1089#1093#1086#1076#1099' '#1087#1086' '#1082#1086#1096#1077#1083#1100#1082#1072#1084
+        OnClick = nOtchetKoshelClick
+      end
     end
   end
   object ilCash: TImageList

@@ -5,7 +5,7 @@ object fBluda: TfBluda
   BorderStyle = bsSingle
   Caption = #1057#1087#1080#1089#1086#1082' '#1073#1083#1102#1076
   ClientHeight = 358
-  ClientWidth = 396
+  ClientWidth = 406
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -22,7 +22,7 @@ object fBluda: TfBluda
   object pBludo1: TPanel
     Left = 0
     Top = 0
-    Width = 396
+    Width = 406
     Height = 41
     Align = alTop
     Color = clGradientActiveCaption
@@ -67,13 +67,13 @@ object fBluda: TfBluda
   object pBludo2: TPanel
     Left = 0
     Top = 41
-    Width = 396
+    Width = 406
     Height = 231
     Align = alClient
     Color = clGradientInactiveCaption
     TabOrder = 1
     object sBludo: TSplitter
-      Left = 161
+      Left = 217
       Top = 1
       Height = 229
       Color = clGradientActiveCaption
@@ -82,7 +82,7 @@ object fBluda: TfBluda
     object lbNameBludo: TListBox
       Left = 1
       Top = 1
-      Width = 160
+      Width = 216
       Height = 229
       Align = alLeft
       ItemHeight = 17
@@ -91,9 +91,9 @@ object fBluda: TfBluda
       OnKeyDown = lbNameBludoKeyDown
     end
     object clbSpisokProd: TCheckListBox
-      Left = 164
+      Left = 220
       Top = 1
-      Width = 231
+      Width = 185
       Height = 229
       OnClickCheck = clbSpisokProdClickCheck
       Align = alClient
@@ -106,7 +106,7 @@ object fBluda: TfBluda
   object pBludo3: TPanel
     Left = 0
     Top = 272
-    Width = 396
+    Width = 406
     Height = 86
     Align = alBottom
     Color = clGradientActiveCaption

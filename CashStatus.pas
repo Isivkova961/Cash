@@ -170,15 +170,17 @@ var
     s, stat: string;
   begin
     if cebDatePokup.Checked then
-      if s = '' then
-        s := s + 'date_pokup = ' + #39 + deDatePokup.Text + #39
-      else
-        s := s + ' and date_pokup = ' + #39 + deDatePokup.Text + #39;
+      if deDatePokup.Text <> '  .  .    ' then
+        if s = '' then
+          s := s + 'date_pokup = ' + #39 + deDatePokup.Text + #39
+        else
+          s := s + ' and date_pokup = ' + #39 + deDatePokup.Text + #39;
     if cebName.Checked then
-      if s = '' then
-        s := s + 'name_pokup = ' + #39 + cobName.Text + #39
-      else
-        s := s + ' and name_pokup = ' + #39 + cobName.Text + #39;
+      if cobName.Text <> '' then
+        if s = '' then
+          s := s + 'name_pokup = ' + #39 + cobName.Text + #39
+        else
+          s := s + ' and name_pokup = ' + #39 + cobName.Text + #39;
     if cebYesStatus.Checked then
       stat := 'true'
     else

@@ -41,6 +41,7 @@ uses CashDM, CachMain, CashBludo;
 procedure TfSpisokBlud.FormShow(Sender: TObject);
 begin
   LoadData;
+  tbDelete.Enabled := (dmCash.adoqBludoPr.RecordCount > 0);
 end;
 
 procedure TfSpisokBlud.LoadData;
@@ -60,6 +61,7 @@ end;
 procedure TfSpisokBlud.tbNewClick(Sender: TObject);
 begin
   fBluda.ShowModal;
+  tbDelete.Enabled := (dmCash.adoqBludoPr.RecordCount > 0);
 end;
 
 procedure TfSpisokBlud.tbDeleteClick(Sender: TObject);
@@ -76,6 +78,7 @@ begin
         end;
       LoadData;
     end;
+  tbDelete.Enabled := (dmCash.adoqBludoPr.RecordCount > 0);
 end;
 
 procedure TfSpisokBlud.dbgBludoKeyDown(Sender: TObject; var Key: Word;
@@ -84,6 +87,9 @@ begin
   if dmCash.adoqBludoPr.RecordCount > 0 then
     if Key = 46 then
       tbDelete.Click;
+  tbDelete.Enabled := (dmCash.adoqBludoPr.RecordCount > 0);
+  if Key = 45 then
+    tbNew.Click;
 end;
 
 end.
