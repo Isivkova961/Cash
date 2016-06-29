@@ -30,7 +30,6 @@ type
     dsSpisok: TDataSource;
     adoqLekar: TADOQuery;
     dsLekar: TDataSource;
-    adoqDrevo2: TADOQuery;
     adoqItog: TADOQuery;
     dsItog: TDataSource;
     adoqSpisokBlud: TADOQuery;
@@ -42,9 +41,26 @@ type
     adoqVirtualD: TADOQuery;
     dsVirtualD: TDataSource;
     adoqOtchet: TADOQuery;
+    adoqEvent: TADOQuery;
+    dsEvent: TDataSource;
+    adoqKat: TADOQuery;
+    adoqZKH: TADOQuery;
+    dsZKH: TDataSource;
+    adoqZKHid: TAutoIncField;
+    adoqZKHkateg: TWideStringField;
+    adoqZKHmean_before: TIntegerField;
+    adoqZKHmean_new: TIntegerField;
+    adoqZKHsumma: TBCDField;
+    adoqZKHitogo: TIntegerField;
+    adoqZKHdate_pay: TDateTimeField;
+    adoqZKHmonth_v: TWideStringField;
+    adoqDrevo2: TADOQuery;
+    adoqCopy: TADOQuery;
+    adoqDataCopy: TADOQuery;
     procedure adoqLekarAfterInsert(DataSet: TDataSet);
     procedure adoqStatusAfterInsert(DataSet: TDataSet);
     procedure adoqSpisokAfterInsert(DataSet: TDataSet);
+    procedure adoqZKHCalcFields(DataSet: TDataSet);
 
   private
     { Private declarations }
@@ -74,6 +90,11 @@ end;
 procedure TdmCash.adoqSpisokAfterInsert(DataSet: TDataSet);
 begin
   adoqSpisok.FieldByName('status').Value := false;
+end;
+
+procedure TdmCash.adoqZKHCalcFields(DataSet: TDataSet);
+begin
+  adoqZKHitogo.Value := adoqZKHmean_new.Value - adoqZKHmean_before.Value;
 end;
 
 end.

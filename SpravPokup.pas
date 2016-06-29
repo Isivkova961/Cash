@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Gauges, ComCtrls, VirtualTrees, ImgList, ExtCtrls, ToolWin, ActiveX;
+  Dialogs, Gauges, ComCtrls, VirtualTrees, ImgList, ExtCtrls, ToolWin, ActiveX,
+  Grids, DBGrids;
 
 type
   TfSprav = class(TForm)
@@ -421,7 +422,7 @@ begin
     id_prod[i].Clear;
   with dmCash do
     begin
-      adoqDrevo2.SQL.Text:='SELECT * FROM sprav_pokup';
+      adoqDrevo2.SQL.Text := 'SELECT * FROM sprav_pokup';
       adoqDrevo2.Open;
 
       while not (adoqDrevo2.Eof) do
@@ -441,6 +442,7 @@ begin
               id_prod[2][j] := id_prod[2][j] + s + adoqDrevo2.FieldByName('id').AsString + ',';
               adoqDrevo2.Next;
             end;
+          adoqDrevo2.Filtered := false;
         end;
     end;
 
@@ -499,7 +501,8 @@ end;
 
 procedure TfSprav.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  fMainCash.VivodKat;
+  fMainCash.id_prod[1] := id_prod[1];
+  fMainCash.id_prod[2] := id_prod[2];
 end;
 
 end.

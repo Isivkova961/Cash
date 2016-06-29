@@ -23,6 +23,8 @@ type
       Shift: TShiftState);
     procedure dbgLekarCellClick(Column: TColumnEh);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
   public
@@ -197,6 +199,13 @@ begin
   dbgLekar.Options := dbgLekar.Options + [dgRowSelect];
   dbgLekar.Options := dbgLekar.Options - [dgEditing];
   dbgLekar.ReadOnly := true;
+end;
+
+procedure TfSpisokLekar.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 27 then
+    Close;
 end;
 
 end.

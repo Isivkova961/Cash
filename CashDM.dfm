@@ -167,12 +167,6 @@ object dmCash: TdmCash
     Left = 376
     Top = 96
   end
-  object adoqDrevo2: TADOQuery
-    Connection = adocCash
-    Parameters = <>
-    Left = 136
-    Top = 264
-  end
   object adoqItog: TADOQuery
     Active = True
     Connection = adocCash
@@ -265,5 +259,90 @@ object dmCash: TdmCash
       '')
     Left = 16
     Top = 408
+  end
+  object adoqEvent: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM event')
+    Left = 328
+    Top = 352
+  end
+  object dsEvent: TDataSource
+    DataSet = adoqEvent
+    Left = 376
+    Top = 352
+  end
+  object adoqKat: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 136
+    Top = 320
+  end
+  object adoqZKH: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    OnCalcFields = adoqZKHCalcFields
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM payment')
+    Left = 328
+    Top = 400
+    object adoqZKHid: TAutoIncField
+      FieldName = 'id'
+      ReadOnly = True
+    end
+    object adoqZKHkateg: TWideStringField
+      FieldName = 'kateg'
+      Size = 255
+    end
+    object adoqZKHmean_before: TIntegerField
+      FieldName = 'mean_before'
+    end
+    object adoqZKHmean_new: TIntegerField
+      FieldName = 'mean_new'
+    end
+    object adoqZKHsumma: TBCDField
+      FieldName = 'summa'
+      Precision = 19
+    end
+    object adoqZKHitogo: TIntegerField
+      FieldKind = fkCalculated
+      FieldName = 'itogo'
+      Calculated = True
+    end
+    object adoqZKHdate_pay: TDateTimeField
+      FieldName = 'date_pay'
+    end
+    object adoqZKHmonth_v: TWideStringField
+      FieldName = 'month_v'
+      Size = 255
+    end
+  end
+  object dsZKH: TDataSource
+    DataSet = adoqZKH
+    Left = 376
+    Top = 400
+  end
+  object adoqDrevo2: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 136
+    Top = 264
+  end
+  object adoqCopy: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 128
+    Top = 368
+  end
+  object adoqDataCopy: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 184
+    Top = 368
   end
 end

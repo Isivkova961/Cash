@@ -31,7 +31,6 @@ type
     procedure bCancelClick(Sender: TObject);
     procedure NewDetail;
     procedure bOKClick(Sender: TObject);
-    procedure cobKategExit(Sender: TObject);
   private
     { Private declarations }
   public
@@ -285,17 +284,6 @@ begin
   fMainCash.OutData;
   fMainCash.SummaDate;
   Close;
-end;
-
-procedure TfCashDetail.cobKategExit(Sender: TObject);
-begin
-  if cobKateg.Items.IndexOf(cobKateg.Text) = - 1 then
-    begin
-      if MessageDlg('Данной категории нет в справочнике.' + #10 + #13 + ' Добавить?', mtWarning, mbOkCancel, 0) = mrOk then
-        fSpravNE.ShowModal
-      else
-        cobKateg.Text := '';
-    end;
 end;
 
 end.

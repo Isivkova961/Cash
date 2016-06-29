@@ -91,9 +91,9 @@ object fCashDetail: TfCashDetail
       Top = 48
       Width = 185
       Height = 25
+      Style = csDropDownList
       ItemHeight = 17
       TabOrder = 1
-      OnExit = cobKategExit
     end
     object cobKoshel: TComboBox
       Left = 144

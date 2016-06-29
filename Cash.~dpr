@@ -11,13 +11,15 @@ uses
   CashStatus in 'CashStatus.pas' {fStatus},
   SpisokLekar in 'SpisokLekar.pas' {fSpisokLekar},
   SpisokBlud in 'SpisokBlud.pas' {fSpisokBlud},
-  CashBludo in 'CashBludo.pas' {fBluda};
+  CashBludo in 'CashBludo.pas' {fBluda},
+  CashEvent in 'CashEvent.pas' {fCashEvent},
+  CashZKH in 'CashZKH.pas' {fCashZKH};
 
 {$R *.res}
 
 begin
   Application.Initialize;
-  Application.Title := 'Cash 1.1';
+  Application.Title := 'Cash 1.3';
   Application.CreateForm(TfMainCash, fMainCash);
   Application.CreateForm(TfStatus, fStatus);
   Application.CreateForm(TfSprav, fSprav);
@@ -28,5 +30,7 @@ begin
   Application.CreateForm(TfSpisokLekar, fSpisokLekar);
   Application.CreateForm(TfSpisokBlud, fSpisokBlud);
   Application.CreateForm(TfBluda, fBluda);
+  Application.CreateForm(TfCashEvent, fCashEvent);
+  Application.CreateForm(TfCashZKH, fCashZKH);
   Application.Run;
 end.

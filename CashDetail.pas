@@ -82,7 +82,8 @@ begin
     begin
       SQL.Clear;
       SQL.Append('SELECT * FROM sprav_pokup');
-      SQL.Append('WHERE id_kat <> null');
+      if fMainCash.bReal_Virt = true then
+        SQL.Append('WHERE id_kat <> null');
       SQL.Append('ORDER BY d_r, name_kat ASC');
       Open;
       DisableControls;

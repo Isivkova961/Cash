@@ -74,14 +74,6 @@ begin
         if cebOpen.Checked = false then
           LoadData('WHERE status = false');
       end;
-  if key = 45 then
-    begin
-      with dmCash.adoqSpisok do
-        begin
-          Insert;
-          Post;
-        end;
-    end;
   if dmCash.adoqSpisok.RecordCount > 0 then
     if Key = 46 then
       if MessageDlg('Вы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then

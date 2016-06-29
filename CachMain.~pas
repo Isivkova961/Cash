@@ -62,6 +62,9 @@ type
     nMonthR: TMenuItem;
     nViewSpisok: TMenuItem;
     nOtchetKoshel: TMenuItem;
+    nEvent: TMenuItem;
+    nPayMent: TMenuItem;
+    nCopyDate: TMenuItem;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: WideString);
@@ -114,6 +117,10 @@ type
     procedure nMonthRClick(Sender: TObject);
     procedure nOtchetKoshelClick(Sender: TObject);
     procedure ExcelOthet;
+    procedure nEventClick(Sender: TObject);
+    procedure nPayMentClick(Sender: TObject);
+    procedure tbCopyClick(Sender: TObject);
+    procedure nCopyDateClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -142,7 +149,7 @@ var
 implementation
 
 uses CashDM, CashDetail, SpravPokup, SpisokPokup, CashStatus, SpisokLekar,
-  SpisokBlud;
+  SpisokBlud, CashEvent, CashZKH, CashNewDate;
 
 {$R *.dfm}
 
@@ -223,11 +230,12 @@ var
 
     with dmCash do
       begin
-        adoqSumRV.SQL.Text := 'SELECT * FROM summa_real';
-        adoqSumRV.Open;
-
         adoqSprav.SQL.Text := 'SELECT * FROM sprav_pokup';
         adoqSprav.Open;
+
+        adoqSumRV.SQL.Text := 'SELECT * FROM summa_real WHERE month_v = :m_v';
+        adoqSumRV.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
+        adoqSumRV.Open;
 
         while not (adoqSumRV.Eof) do   //Цикл по данным из сумм по реальным расходам
           begin
@@ -258,7 +266,8 @@ var
             adoqSumRV.Next;
           end;
 
-        adoqSumRV.SQL.Text := 'SELECT * FROM Summa_virtual';
+        adoqSumRV.SQL.Text := 'SELECT * FROM Summa_virtual WHERE month_v = :m_v';
+        adoqSumRV.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
         adoqSumRV.Open;
 
         while not (adoqSumRV.Eof) do   //Цикл по данным из сумм по прогнозам
@@ -347,6 +356,7 @@ begin
       end;
     end;
   vtW.EndUpdate;
+  LoadDiagram;
 end;
 
 //отрисовка процеса выполнения
@@ -607,6 +617,7 @@ begin
   sgData.Row := RowCel; //Номер выделенной строки
   ButEnabled;  //Активность кнопок редактирования и удаления
   SummaDate;   //Вывод сумм по расходам и прогнозам
+  VivodData;  
 end;
 
 procedure TfMainCash.FormResize(Sender: TObject);
@@ -679,7 +690,7 @@ begin
       adoqReal.SQL.Append('SELECT real_pokup.*,name_kat');
       adoqReal.SQL.Append('FROM real_pokup,sprav_pokup');
       adoqReal.SQL.Append('WHERE real_pokup.id_prod=sprav_pokup.id AND date_v=:d_v');
-      adoqReal.Parameters.ParamByName('d_v').Value:=StrToDate(Date_data);
+      adoqReal.Parameters.ParamByName('d_v').Value := StrToDate(Date_data);
       adoqReal.Open;
       //Конец заполнения таблицы расходы
 
@@ -688,7 +699,7 @@ begin
       adoqVirtual.SQL.Append('SELECT virtual_pokup.*,name_kat');
       adoqVirtual.SQL.Append('FROM virtual_pokup,sprav_pokup');
       adoqVirtual.SQL.Append('WHERE virtual_pokup.id_prod=sprav_pokup.id AND date_v=:d_v');
-      adoqVirtual.Parameters.ParamByName('d_v').Value:=StrToDate(Date_data);
+      adoqVirtual.Parameters.ParamByName('d_v').Value := StrToDate(Date_data);
       adoqVirtual.Open;
       //Конец заполнения таблицы прогнозы
     end;
@@ -816,6 +827,7 @@ procedure TfMainCash.tbDeleteClick(Sender: TObject);
 begin
   if MessageDlg('Вы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
     DeleteRow;
+  VivodKat;
   VivodData;
   SummaDate;
 end;
@@ -892,26 +904,27 @@ begin
     id_prod[i].Clear;
   with dmCash do
     begin
-      adoqDrevo.SQL.Text:='SELECT * FROM sprav_pokup';
-      adoqDrevo.Open;
+      adoqKat.SQL.Text:='SELECT * FROM sprav_pokup';
+      adoqKat.Open;
 
-      while not (adoqDrevo.Eof) do
+      while not (adoqKat.Eof) do
         begin
-          id_prod[1].Append(adoqDrevo.FieldByName('id').AsString);
+          id_prod[1].Append(adoqKat.FieldByName('id').AsString);
           id_prod[2].Append('');
-          adoqDrevo.Next;
+          adoqKat.Next;
         end;
       for j:=0 to id_prod[1].Count - 1 do
         begin
-          adoqDrevo.Filter := 'id_kat = ' + id_prod[1][j];
-          adoqDrevo.Filtered := true;
-          adoqDrevo.First;
-          while not (adoqDrevo.Eof) do
+          adoqKat.Filter := 'id_kat = ' + id_prod[1][j];
+          adoqKat.Filtered := true;
+          adoqKat.First;
+          while not (adoqKat.Eof) do
             begin
               s := ' ';
-              id_prod[2][j] := id_prod[2][j] + s + adoqDrevo.FieldByName('id').AsString + ',';
-              adoqDrevo.Next;
+              id_prod[2][j] := id_prod[2][j] + s + adoqKat.FieldByName('id').AsString + ',';
+              adoqKat.Next;
             end;
+          adoqKat.Filtered := false;
         end;
     end;
 
@@ -972,6 +985,7 @@ begin
   sgData.Row := RowCel; //Номер выделенной строки
   ButEnabled;  //Активность кнопок редактирования и удаления
   SummaDate;   //Вывод сумм по расходам и прогнозам
+  VivodData;
 end;
 
 procedure TfMainCash.nStatusClick(Sender: TObject);
@@ -1025,6 +1039,20 @@ begin
         begin
           lekar := 'Вышел срок годности у следующих лекарств:' + #10 + #13 + lekar;
           ShowMessage(lekar);
+        end;
+    end;
+
+  with dmCash do
+    begin
+      adoqEvent.SQL.Text := 'SELECT * FROM event';
+      adoqEvent.Open;
+      while not (adoqEvent.Eof) do
+        begin
+          if adoqEvent.FieldByName('date_recall').Value = Date then
+            ShowMessage(adoqEvent.FieldByName('message').AsString);
+          if ((Date - adoqEvent.FieldByName('date_exe').Value) mod adoqEvent.FieldByName('repet').Value) = 0 then
+            ShowMessage(adoqEvent.FieldByName('message').AsString);
+          adoqEvent.Next;
         end;
     end;
 end;
@@ -1243,6 +1271,46 @@ begin
 
   ShowMessage('Отчет готов!');
   XLApp.Visible := true;
+end;
+
+procedure TfMainCash.nEventClick(Sender: TObject);
+begin
+  fCashEvent.ShowModal;
+end;
+
+procedure TfMainCash.nPayMentClick(Sender: TObject);
+begin
+  fCashZKH.ShowModal;
+end;
+
+procedure TfMainCash.tbCopyClick(Sender: TObject);
+begin
+  if MessageDlg('Скопировать данные на следующий месяц?', mtWarning, mbOkCancel, 0) = mrOk then
+    begin
+      fCashNewDate.deNewDate.Date := IncMonth(StrToDate(Date_data));
+      fCashNewDate.ShowModal;
+    end;
+end;
+
+procedure TfMainCash.nCopyDateClick(Sender: TObject);
+begin
+  if MessageDlg('Скопировать данные на следующий день?', mtWarning, mbOkCancel, 0) = mrOk then
+    with dmCash do
+      begin
+        adoqCopy.SQL.Clear;
+        adoqCopy.SQL.Append('INSERT INTO virtual_pokup');
+        adoqCopy.SQL.Append('(month_v, date_v, id_prod, sum_d, koshel, comment, kol)');
+        adoqCopy.SQL.Append('VALUES(:m_v, :d_v, :i_p, :s_d, :kos, :com, :kl)');
+        adoqCopy.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
+        adoqCopy.Parameters.ParamByName('d_v').Value := IncDay(StrToDate(Date_data));
+        adoqCopy.Parameters.ParamByName('i_p').Value := adoqVirtual.FieldByName('id_prod').Value;
+        adoqCopy.Parameters.ParamByName('s_d').Value := adoqVirtual.FieldByName('sum_d').Value;
+        adoqCopy.Parameters.ParamByName('kos').Value := adoqVirtual.FieldByName('koshel').Value;
+        adoqCopy.Parameters.ParamByName('com').Value := adoqVirtual.FieldByName('comment').Value;
+        adoqCopy.Parameters.ParamByName('kl').Value := adoqVirtual.FieldByName('kol').Value;
+        adoqCopy.ExecSQL;
+        VivodData;
+      end;
 end;
 
 end.

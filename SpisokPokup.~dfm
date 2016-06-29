@@ -15,6 +15,7 @@ object fSpisokPokup: TfSpisokPokup
   Menu = mmSpisok
   OldCreateOrder = False
   Position = poScreenCenter
+  OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96

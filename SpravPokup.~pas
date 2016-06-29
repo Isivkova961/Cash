@@ -53,6 +53,7 @@ type
       Shift: TShiftState);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -78,7 +79,7 @@ var
 
 implementation
 
-uses CashDM, SpravNE;
+uses CashDM, SpravNE, CachMain;
 
 {$R *.dfm}
 
@@ -494,6 +495,12 @@ procedure TfSprav.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = 27 then
     Close;
+end;
+
+procedure TfSprav.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  fMainCash.id_prod[1] := id_prod[1];
+  fMainCash.id_prod[2] := id_prod[2];
 end;
 
 end.

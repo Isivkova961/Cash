@@ -23,6 +23,8 @@ type
     procedure cebOpenClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure nExcelClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
   public
@@ -154,6 +156,13 @@ begin
 
   ShowMessage('Список выведен!');
   XLApp.Visible := true;
+end;
+
+procedure TfSpisokPokup.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 27 then
+    Close;
 end;
 
 end.

@@ -3,7 +3,7 @@ object fMainCash: TfMainCash
   Top = 189
   Width = 1037
   Height = 680
-  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.2)'
+  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.3)'
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -572,6 +572,7 @@ object fMainCash: TfMainCash
           Hint = #1057#1082#1086#1087#1080#1088#1086#1074#1072#1090#1100' '#1085#1072' '#1089#1083#1077#1076#1091#1102#1097#1080#1081' '#1084#1077#1089#1103#1094
           Caption = 'tbCopy'
           ImageIndex = 2
+          OnClick = tbCopyClick
         end
       end
       object pcDetail: TPageControl
@@ -862,6 +863,14 @@ object fMainCash: TfMainCash
         Caption = #1056#1072#1089#1093#1086#1076#1099' '#1087#1086' '#1082#1086#1096#1077#1083#1100#1082#1072#1084
         OnClick = nOtchetKoshelClick
       end
+    end
+    object nEvent: TMenuItem
+      Caption = #1055#1088#1086#1089#1084#1086#1090#1088' '#1089#1086#1073#1099#1090#1080#1081
+      OnClick = nEventClick
+    end
+    object nPayMent: TMenuItem
+      Caption = #1054#1087#1083#1072#1090#1072' '#1046#1050#1061
+      OnClick = nPayMentClick
     end
   end
   object ilCash: TImageList
@@ -1292,6 +1301,10 @@ object fMainCash: TfMainCash
       ImageIndex = 3
       ShortCut = 46
       OnClick = nDeleteClick
+    end
+    object nCopyDate: TMenuItem
+      Caption = #1057#1082#1086#1087#1080#1088#1086#1074#1072#1090#1100' '#1085#1072' '#1089#1083#1077#1076#1091#1102#1097#1080#1081' '#1076#1077#1085#1100
+      OnClick = nCopyDateClick
     end
   end
 end
