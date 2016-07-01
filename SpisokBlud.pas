@@ -23,6 +23,8 @@ type
     procedure tbDeleteClick(Sender: TObject);
     procedure dbgBludoKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
   public
@@ -49,11 +51,14 @@ begin
   with dmCash do
     begin
       adoqBludoPr.SQL.Clear;
+
       adoqBludoPr.SQL.Append('SELECT bludo_pr.*, spisok_blud.name_bludo');
       adoqBludoPr.SQL.Append('FROM bludo_pr, spisok_blud');
       adoqBludoPr.SQL.Append('WHERE bludo_pr.id_bludo = spisok_blud.id');
       adoqBludoPr.SQL.Append('AND month_prig = :m_p');
+
       adoqBludoPr.Parameters.ParamByName('m_p').Value := fMainCash.cobMonth.Text + ' ' + fMainCash.spGod.Text;
+
       adoqBludoPr.Open;
     end;
 end;
@@ -71,13 +76,18 @@ begin
       with dmCash do
         begin
           adoqAddBludo.SQL.Clear;
+
           adoqAddBludo.SQL.Append('DELETE FROM bludo_pr');
           adoqAddBludo.SQL.Append('WHERE id = :iid');
+
           adoqAddBludo.Parameters.ParamByName('iid').Value := adoqBludoPr.FieldByName('id').Value;
+
           adoqAddBludo.ExecSQL;
         end;
+
       LoadData;
     end;
+
   tbDelete.Enabled := (dmCash.adoqBludoPr.RecordCount > 0);
 end;
 
@@ -87,9 +97,18 @@ begin
   if dmCash.adoqBludoPr.RecordCount > 0 then
     if Key = 46 then
       tbDelete.Click;
+
   tbDelete.Enabled := (dmCash.adoqBludoPr.RecordCount > 0);
+  
   if Key = 45 then
     tbNew.Click;
+end;
+
+procedure TfSpisokBlud.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 27 then
+    Close;
 end;
 
 end.

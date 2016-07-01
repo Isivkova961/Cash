@@ -65,6 +65,8 @@ type
     nEvent: TMenuItem;
     nPayMent: TMenuItem;
     nCopyDate: TMenuItem;
+    nGoal: TMenuItem;
+    nCarExpen: TMenuItem;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: WideString);
@@ -121,10 +123,12 @@ type
     procedure nPayMentClick(Sender: TObject);
     procedure tbCopyClick(Sender: TObject);
     procedure nCopyDateClick(Sender: TObject);
+    procedure nGoalClick(Sender: TObject);
+    procedure nCarExpenClick(Sender: TObject);
   private
     { Private declarations }
   public
-    bReal_Virt,bNew_Edit: boolean;
+    bReal_Virt, bNew_Edit: boolean;
     Date_data: string;
     id_prod: array [1..2] of TStringList;
     { Public declarations }
@@ -149,7 +153,7 @@ var
 implementation
 
 uses CashDM, CashDetail, SpravPokup, SpisokPokup, CashStatus, SpisokLekar,
-  SpisokBlud, CashEvent, CashZKH, CashNewDate;
+  SpisokBlud, CashEvent, CashZKH, CashNewDate, CashGoal, CashCar;
 
 {$R *.dfm}
 
@@ -161,11 +165,13 @@ var
   Data: PvtWinfo;
 begin
   Data := Sender.GetNodeData(Node);
+
   if Assigned(Data) then
      begin
+        //В зависимости от номера столбца записываем в дерево
         case Column of
-          0: CellText := Data.tname;
-          1: CellText := FloatToStr(Data.r_sum)+' из '+FloatToStr(Data.v_sum);
+          0: CellText := Data.tname;  //запись в дерева названия категории
+          1: CellText := FloatToStr(Data.r_sum)+' из '+FloatToStr(Data.v_sum);  //Сумма расходов и сумма прогнозов
         end;
      end;
 end;
@@ -177,6 +183,7 @@ var
   Data: PvtWinfo;
 begin
   Data := Sender.GetNodeData(Node);
+  //Находим эти данные и освобождаем память
   if Assigned(Data) then
      Finalize(Data^);
 end;
@@ -192,14 +199,17 @@ begin
       Data.ID := adoqDrevo1.FieldByName('id').AsInteger;
       Data.tname := adoqDrevo1.FieldByName('name_kat').AsString;
       Data.pID := adoqDrevo1.FieldByName('id_kat').AsInteger;
+
       if adoqDrevo1.FieldByName('virtual_sum').AsFloat < 0 then
         Data.v_sum := - adoqDrevo1.FieldByName('virtual_sum').AsFloat
       else
         Data.v_sum := adoqDrevo1.FieldByName('virtual_sum').AsFloat;
+
       if adoqDrevo1.FieldByName('real_sum').AsFloat < 0 then
         Data.r_sum := - adoqDrevo1.FieldByName('real_sum').AsFloat
       else
         Data.r_sum := adoqDrevo1.FieldByName('real_sum').AsFloat;
+
     end;
 end;
 
@@ -209,6 +219,7 @@ var
 begin
   //выделение памяти под структуру
   vtW.NodeDataSize := SizeOf(RvtWinfo);
+
   for i := 1 to 2 do
     id_prod[i] := TStringList.Create;
 end;
@@ -240,16 +251,18 @@ var
         while not (adoqSumRV.Eof) do   //Цикл по данным из сумм по реальным расходам
           begin
             j := 0;
+
             while j < id_prod[1].Count do //Цикл по дереву из данных по стравочнику статей бюджета
               begin
+
                 if (pos(' ' + adoqSumRV.FieldByName('id').AsString + ',', id_prod[2][j]) > 0) //Если номер продукта есть в подкатегории справочника статей
                     or (id_prod[1][j] = adoqSumRV.FieldByName('id').AsString) then   //Или номер является самой категорией
                   begin
                     adoqSprav.Locate('id',id_prod[1][j],[]);     //Находим в справочнике этот номер
                     l := summa_r_v[1].IndexOf(adoqSprav.FieldByName('id').AsString);   //Смотрим, есть ли номер из справоника в суммах
-                    if l > - 1 then
-                      summa_r_v[4][l] := FloatToStr(StrToFloat(summa_r_v[4][l]) + adoqSumRV.FieldByName('real_sum').AsFloat)  //Если есть, то
-                                                                                                //Прибавлем к сумме данные по сумме по расходам
+
+                    if l > - 1 then  //Если есть, то прибавлем к сумме данные по сумме по расходам
+                      summa_r_v[4][l] := FloatToStr(StrToFloat(summa_r_v[4][l]) + adoqSumRV.FieldByName('real_sum').AsFloat)
                     else
                       begin
                         summa_r_v[1].Append(adoqSprav.FieldByName('id').AsString);        //Добавляем данные из справоника и сумм расходов
@@ -258,11 +271,14 @@ var
                         summa_r_v[4].Append(adoqSumRV.FieldByName('real_sum').AsString);
                         summa_r_v[5].Append('0');     //Данные по прогнозам, в реальных присваиваем им нулю
                       end;
+
                     j := j + 1;
                   end
                 else
                   j := j + 1;
+
               end;
+
             adoqSumRV.Next;
           end;
 
@@ -273,16 +289,18 @@ var
         while not (adoqSumRV.Eof) do   //Цикл по данным из сумм по прогнозам
           begin
             j := 0;
+
             while j < id_prod[1].Count do   //Цикл по дереву из данных по стравочнику статей бюджета
               begin
+
                 if (pos(' ' + adoqSumRV.FieldByName('id').AsString + ',', id_prod[2][j]) > 0)   //Если номер продукта есть в подкатегории справочника статей
                     or (id_prod[1][j] = adoqSumRV.FieldByName('id').AsString) then  //Или номер является самой категорией
                   begin
                     adoqSprav.Locate('id',id_prod[1][j],[]);        //Находим в справочнике этот номер
                     l := summa_r_v[1].IndexOf(adoqSprav.FieldByName('id').AsString);  //Смотрим, есть ли номер из справоника в суммах
-                    if l > - 1 then
-                      summa_r_v[5][l] := FloatToStr(StrToFloat(summa_r_v[5][l]) + adoqSumRV.FieldByName('virtual_sum').AsFloat) //Если есть, то
-                                                                                               //Прибавлем к сумме данные по сумме по расходам
+
+                    if l > - 1 then    //Если есть, то  прибавлем к сумме данные по сумме по расходам
+                      summa_r_v[5][l] := FloatToStr(StrToFloat(summa_r_v[5][l]) + adoqSumRV.FieldByName('virtual_sum').AsFloat)
                     else
                       begin
                         summa_r_v[1].Append(adoqSprav.FieldByName('id').AsString);            //Добавляем данные из справоника и сумм расходов
@@ -291,11 +309,14 @@ var
                         summa_r_v[4].Append('0');      //Данные по расходам, в прогнозах присваиваем им нулю
                         summa_r_v[5].Append(adoqSumRV.FieldByName('virtual_sum').AsString);
                       end;
+
                     j := j + 1;
                   end
                 else
                   j := j + 1;
+
               end;
+
             adoqSumRV.Next;
           end;
 
@@ -308,22 +329,29 @@ var
             adoqDrevo.SQL.Clear;
             adoqDrevo.SQL.Append('INSERT INTO itog (id, name_kat, id_kat, real_sum, virtual_sum)');
             adoqDrevo.SQL.Append('VALUES (:iid, :n_k, :i_k, :r_s, :v_s)');
+
             adoqDrevo.Parameters.ParamByName('iid').Value := StrToInt(summa_r_v[1][k]);
             adoqDrevo.Parameters.ParamByName('n_k').Value := summa_r_v[2][k];
+            adoqDrevo.Parameters.ParamByName('r_s').Value := summa_r_v[4][k];
+            adoqDrevo.Parameters.ParamByName('v_s').Value := summa_r_v[5][k];
+
             if summa_r_v[3][k] <> '' then
               adoqDrevo.Parameters.ParamByName('i_k').Value := StrToInt(summa_r_v[3][k])
             else
               adoqDrevo.Parameters.ParamByName('i_k').Value := null;
-            adoqDrevo.Parameters.ParamByName('r_s').Value := summa_r_v[4][k];
-            adoqDrevo.Parameters.ParamByName('v_s').Value := summa_r_v[5][k];
+
             adoqDrevo.ExecSQL;
           end;
+
       end;
+
   end;
 begin
   VivodTableKat;
+
   vtW.Clear;
   vtW.BeginUpdate;
+
   with dmCash do
     begin
       adoqDrevo1.SQL.Clear;
@@ -340,22 +368,28 @@ begin
         else
           begin
             node1 := vtW.GetFirst();
+
             while (node1 <> nil) do
               begin
                 Data := vtW.GetNodeData(node1);
+
                 if (Assigned(Data)) and (Data.ID = adoqDrevo1.FieldByName('id_kat').Value) then
                   begin
                     node := vtW.addChild(node1);
                     break;
                   end;
+
                 node1 := vtW.GetNext(node1);
               end;
           end;
+
         initNode(node);
         adoqDrevo1.Next;
       end;
     end;
+
   vtW.EndUpdate;
+
   LoadDiagram;
 end;
 
@@ -375,7 +409,6 @@ begin
 
     if Assigned(Data) then
     begin
-
       // прогресс-бар рисуем только в ячейках второй колонки
       if Column = 1 then
       begin
@@ -399,6 +432,7 @@ begin
           procent := 100
         else
           procent := (Data.r_sum / Data.v_sum) * 100;
+
         ProgressBarRect.Right := round((CellRect.Right - CellRect.Left) / 100 * procent)  + CellRect.Left;
         ProgressBarRect.Bottom := CellRect.Bottom - 1; // отступ от края в 1 пиксель снизу
 
@@ -406,17 +440,17 @@ begin
         // если расстояние между левым и правым краями получившегося прямоугольника
         // меньше 1 пикселя, то лучше вообще ничего не рисовать ибо фигня получается
         if (ProgressBarRect.Right - ProgressBarRect.Left) > 0 then
-        begin
-          if Data.r_sum > Data.v_sum then
-            TargetCanvas.Brush.Color := RGB(255,64,69) // Если реальные больше виртуальных, тогда красный
-          else
-            if procent = 100 then
-              TargetCanvas.Brush.Color := RGB(0,255,10)  //Если 100% значит зеленый
+          begin
+            if Data.r_sum > Data.v_sum then
+              TargetCanvas.Brush.Color := RGB(255,64,69) // Если реальные больше виртуальных, тогда красный
             else
-              TargetCanvas.Brush.Color := RGB(23,133,253);  //Иначе синий
+              if procent = 100 then
+                TargetCanvas.Brush.Color := RGB(0,255,10)  //Если 100% значит зеленый
+              else
+                TargetCanvas.Brush.Color := RGB(23,133,253);  //Иначе синий
 
-          TargetCanvas.FillRect(ProgressBarRect);       // и рисуем
-        end;
+            TargetCanvas.FillRect(ProgressBarRect);       // и рисуем
+          end;
 
         // итак, только что мы нарисовали прямоугольник, который впоследствии станет
         // более темной обводкой прогресс-бара шириной в 1 пиксель.
@@ -432,17 +466,17 @@ begin
         // если расстояние между левым и правым краями получившегося прямоугольника
         // меньше 1 пикселя, то лучше вообще ничего не рисовать ибо фигня получается
         if (ProgressBarRect.Right - ProgressBarRect.Left) > 0 then
-        begin
-          if Data.r_sum > Data.v_sum then
-            TargetCanvas.Brush.Color := RGB(255,64,69) // Если реальные больше виртуальных, тогда красный
-          else
-            if procent = 100 then
-              TargetCanvas.Brush.Color := RGB(0,255,10)  //Если 100% значит зеленый
+          begin
+            if Data.r_sum > Data.v_sum then
+              TargetCanvas.Brush.Color := RGB(255,64,69) // Если реальные больше виртуальных, тогда красный
             else
-              TargetCanvas.Brush.Color := RGB(23,133,253); //Иначе синий
+              if procent = 100 then
+                TargetCanvas.Brush.Color := RGB(0,255,10)  //Если 100% значит зеленый
+              else
+                TargetCanvas.Brush.Color := RGB(23,133,253); //Иначе синий
 
-          TargetCanvas.FillRect(ProgressBarRect);
-        end;
+            TargetCanvas.FillRect(ProgressBarRect);
+          end;
       end;
     end;
   end;
@@ -457,12 +491,14 @@ var
 begin
   month_ := cobMonth.Text;
   delete(month_, pos(' ', month_), length(month_));
+
   sgData.Cells[0,1] := 'День недели';
   sgData.Cells[1,1] := 'День';
   sgData.Cells[2,1] := 'Сумма';
   sgData.Cells[3,1] := 'Остаток';
   sgData.Cells[4,1] := 'Сумма';
   sgData.Cells[5,1] := 'Остаток';
+
   days := DaysInMonth(spGod.Value, StrToInt(month_));
   sgData.RowCount := days + 2;
   DateSeparator := '.';
@@ -470,12 +506,14 @@ begin
   WD:=DayOfTheWeek(StrToDate('01.' + month_ + '.' + spGod.Text));
   Date_data := DateToStr(Date);
   RowCel := 2;
+
   for i := 1 to days do
     begin
       if length(IntToStr(i)) = 2 then
         sgData.Cells[1,i + 1] := IntToStr(i) + '.'+month_ + '.' + spGod.Text
       else
         sgData.Cells[1,i + 1] := '0'+IntToStr(i) + '.'+month_ + '.'+spGod.Text;
+
       if sgData.Cells[1,i + 1] = DateToStr(Date) then
         RowCel := i + 1;
     end;
@@ -486,6 +524,7 @@ begin
       sgData.Cells[0,i + 1] := IntToStr(i);
       sgData.Cells[3,i + 1] := '0,00 руб.';
       sgData.Cells[5,i + 1] := '0,00 руб.';
+
       case WD of
          1: dw := 'пн';
          2: dw := 'вт';
@@ -495,11 +534,14 @@ begin
          6: dw := 'сб';
          7: dw := 'вс';
       end;
+
       sgData.Cells[0, i + 1] := dw;
       Inc(WD);
+
       if WD = 8 then
         WD := 1;
     end;
+
 end;
 
 //Загрузка дат
@@ -513,18 +555,24 @@ procedure TfMainCash.FormShow(Sender: TObject);
 begin
   LoadDate; //Загрузка дынных о дате
   LoadData; //Загрузка данных в таблицу
+
   SummaDate;//Вывод сумм по расходам и прогнозам
   TabSheet; //Определение какая из таблиц видна на экране и какую редактировать
+
   sgData.Row := RowCel; //Номер выделеной строки
   ButEnabled; //Активность кнопок редактирования и удаления
+  
   VivodKat; //Запись категорий и подкатегорий в список
   VivodData; //Вывод дерева
+
   dbgReal.EvenRowColor := RGB(214,254,252);
   dbgReal.OddRowColor := RGB(254,254,214);
+
   dbgVirtual.EvenRowColor := RGB(214,254,252);
   dbgVirtual.OddRowColor := RGB(254,254,214);
-  TestData;
-  LoadDiagram;
+
+  TestData; //Проверка данных, таких как срок годности лекарств и цели
+  LoadDiagram;  //Загрузка диаграмм
 end;
 
 //Отрисовка данных таблицы о суммах
@@ -547,9 +595,11 @@ begin
             sgData.Canvas.Brush.Color := RGB(214,254,252) //цвет фона голубой
           else
             sgData.Canvas.Brush.Color := RGB(254,254,214);//цвет фона желтый
+
           sgData.Canvas.Font.Style := [];                 //текст обычный
         end;
     end;
+
     //Заголовки
     if ARow <= 1 then
       begin
@@ -561,6 +611,7 @@ begin
       begin
         if sgData.Cells[ACol, ARow] = DateToStr(Date) then
           sgData.Canvas.Brush.Color := RGB(153, 251, 180);
+
         if (ACol = 0) then  //Первый столбец
           begin
             if (sgData.Cells[ACol, ARow] = 'сб') or (sgData.Cells[ACol, ARow] = 'вс') then  //Если сб или вс
@@ -573,6 +624,7 @@ begin
           begin
             s := sgData.Cells[ACol, ARow];
             delete(s, pos(' ', s), length(s));
+
             if StrToFloat(s) = 0 then
               sgData.Canvas.Font.Color := RGB(192,192,192) //Если 0, то цвет текста серый
             else
@@ -585,6 +637,7 @@ begin
         if (ACol = 2) or (ACol = 4) then  //Третий и Пятый, там где суммы
           begin
             s := sgData.Cells[ACol, ARow];
+
             if s <> '' then
               begin
                 if StrToFloat(s) >= 0 then
@@ -601,12 +654,16 @@ begin
   sgData.Canvas.Font.Size := 10;                //Размер шрифта
 
   sgData.Canvas.FillRect(Rect);
+
   if (ACol = 1) and (ARow = 0) then
     sgData.Canvas.TextOut(Rect.Left - 10, Rect.Top + 4, 'Дата');   //Первая объединенная ячейка - Дата
+
   if (ACol = 3) and (ARow = 0) then
     sgData.Canvas.TextOut(Rect.Left - 20, Rect.Top + 4, 'Расходы');//Вторая объединенная ячейка - Расходы
+
   if (ACol = 5) and (ARow = 0) then
     sgData.Canvas.TextOut(Rect.Left - 20, Rect.Top + 4, 'Прогнозы'); //Третья объединенная ячейка - Прогнозы
+
   //Выравнивание данных в ячейкам по горизонтали и вертикали по центру
   DrawText(sgData.Canvas.Handle, PChar(sgData.Cells[ACol, ARow]), Length(sgData.Cells[ACol, ARow]), Rect, DT_CENTER or DT_VCENTER or DT_SINGLELINE);
 end;
@@ -630,11 +687,14 @@ begin
       sgData.ColWidths[i] := round(sgData.Width / 10) - 2
     else
       sgData.ColWidths[i] := round(sgData.Width / 5) - 6;
+
   for i := 0 to sgData.RowCount - 1 do
     sgData.RowHeights[i] := 19;
+
   //Изменение размеров столбцов dbgReal в зависимости от размеров самого dbgReal
   for i := 0 to dbgReal.Columns.Count - 1 do
     dbgReal.Columns[i].Width := round(dbgReal.Width / dbgReal.Columns.Count) - 2;
+
   //Изменение размеров столбцов dbgVirtual в зависимости от размеров самого dbgVirtual
   for i := 0 to dbgVirtual.Columns.Count - 1 do
     dbgVirtual.Columns[i].Width := round(dbgVirtual.Width / dbgVirtual.Columns.Count) - 6;
@@ -649,12 +709,15 @@ begin
     bReal_Virt := true
   else
     bReal_Virt := false;
+
   //Изменение размеров столбцов dbgReal в зависимости от размеров самого dbgReal
   for i := 0 to dbgReal.Columns.Count - 1 do
     dbgReal.Columns[i].Width := round(dbgReal.Width / dbgReal.Columns.Count) - 6;
+
   //Изменение размеров столбцов dbgVirtual в зависимости от размеров самого dbgVirtual
   for i := 0 to dbgVirtual.Columns.Count - 1 do
     dbgVirtual.Columns[i].Width := round(dbgVirtual.Width / dbgVirtual.Columns.Count) - 6;
+
   ButEnabled;
 end;
 
@@ -703,6 +766,7 @@ begin
       adoqVirtual.Open;
       //Конец заполнения таблицы прогнозы
     end;
+
   ButEnabled;
 end;
 
@@ -767,6 +831,7 @@ begin
       sgData.Cells[2, i + 1] := '';
       sgData.Cells[4, i + 1] := '';
     end;
+
   //Расчеты по расходам
   with dmCash do
     begin
@@ -778,19 +843,24 @@ begin
                                                         ' ' + spGod.Text;
       adoqSumDate.Open;
       adoqSumDate.First;
+
       while not (adoqSumDate.Eof) do
         begin
           Row_Cel := DayOf(adoqSumDate.FieldByName('date_v').Value);
           sgData.Cells[2, Row_Cel + 1] := FloatToStrF(adoqSumDate.FieldByName('Date_sum').AsFloat, ffFixed, 8, 2);
           adoqSumDate.Next;
         end;
+
       summa := 0;
+
       for i := 1 to sgData.RowCount do
         begin
           if sgData.Cells[2, i + 1]<>'' then
             summa := summa + StrToFloat(sgData.Cells[2, i + 1]);
+
           sgData.Cells[3, i + 1] := FloatToStrF(summa, ffFixed, 8, 2)+' руб.';
         end;
+
     end;
   //Конец расчета по расходам
 
@@ -805,17 +875,21 @@ begin
                                                       ' ' + spGod.Text;
       adoqSumDate.Open;
       adoqSumDate.First;
+
       while not (adoqSumDate.Eof) do
         begin
           Row_Cel := DayOf(adoqSumDate.FieldByName('date_v').Value);
           sgData.Cells[4, Row_Cel + 1] := FloatToStrF(adoqSumDate.FieldByName('Date_sum').AsFloat, ffFixed, 8, 2);
           adoqSumDate.Next;
         end;
+
       summa := 0;
+
       for i := 1 to sgData.RowCount do
         begin
           if sgData.Cells[4, i + 1]<>'' then
             summa := summa + StrToFloat(sgData.Cells[4, i + 1]);
+
           sgData.Cells[5, i + 1] := FloatToStrF(summa, ffFixed, 8, 2)+' руб.';
         end;
     end;
@@ -827,6 +901,7 @@ procedure TfMainCash.tbDeleteClick(Sender: TObject);
 begin
   if MessageDlg('Вы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
     DeleteRow;
+
   VivodKat;
   VivodData;
   SummaDate;
@@ -868,6 +943,7 @@ begin
           adoqDetail.ExecSQL;
         end;
     end;
+
   OutData;
 end;
 
@@ -876,6 +952,7 @@ procedure TfMainCash.nDeleteClick(Sender: TObject);
 begin
   if MessageDlg('Вы уверены что хотите удалить?',mtWarning,mbOkCancel,0) = mrOk then
     DeleteRow;
+
   VivodData;
   SummaDate;
 end;
@@ -902,6 +979,7 @@ var
 begin
   for i := 1 to 2 do
     id_prod[i].Clear;
+
   with dmCash do
     begin
       adoqKat.SQL.Text:='SELECT * FROM sprav_pokup';
@@ -913,17 +991,20 @@ begin
           id_prod[2].Append('');
           adoqKat.Next;
         end;
+
       for j:=0 to id_prod[1].Count - 1 do
         begin
           adoqKat.Filter := 'id_kat = ' + id_prod[1][j];
           adoqKat.Filtered := true;
           adoqKat.First;
+
           while not (adoqKat.Eof) do
             begin
               s := ' ';
               id_prod[2][j] := id_prod[2][j] + s + adoqKat.FieldByName('id').AsString + ',';
               adoqKat.Next;
             end;
+
           adoqKat.Filtered := false;
         end;
     end;
@@ -932,29 +1013,35 @@ begin
   while j < id_prod[1].Count - 1 do
     begin
       s := id_prod[2][j];
+
       if s = '' then
         j := j + 1
       else
         begin
           if s <> '' then
             delete(s, 1, 1);
+
           while length(s) > 0 do
             begin
               if pos(', ', s) > 0 then
                 s1 := copy(s, 1, pos(', ', s) - 1)
               else
                 s1 := copy(s, 1, pos(',', s) - 1);
+
               delete(s, 1, length(s1) + 2);
               i := id_prod[1].IndexOf(s1);
+
               if id_prod[2][i] <> '' then
                 begin
                   id_prod[2][j] := id_prod[2][j] + id_prod[2][i];
+
                   if s <> '' then
                     s := s + ' ';
-                  s := s + copy(id_prod[2][i], 2, length(id_prod[2][i]));
 
+                  s := s + copy(id_prod[2][i], 2, length(id_prod[2][i]));
                 end;
             end;
+
           j := j + 1;
         end;
     end;
@@ -1028,13 +1115,16 @@ begin
       adoqLekar.SQL.Append('SELECT * FROM spisok_lekar');
       adoqLekar.SQL.Append('WHERE f_show = false and the_end = false');
       adoqLekar.Open;
+
       while not (adoqLekar.Eof) do
         begin
           if adoqLekar.FieldByName('date_srok_god').Value <= Date then
             lekar := lekar + adoqLekar.FieldByName('name_lek').AsString + ' - ' +
                     adoqLekar.FieldByName('date_srok_god').AsString + #10 + #13;
+
           adoqLekar.Next;
         end;
+
       if lekar <> '' then
         begin
           lekar := 'Вышел срок годности у следующих лекарств:' + #10 + #13 + lekar;
@@ -1046,12 +1136,15 @@ begin
     begin
       adoqEvent.SQL.Text := 'SELECT * FROM event';
       adoqEvent.Open;
+
       while not (adoqEvent.Eof) do
         begin
           if adoqEvent.FieldByName('date_recall').Value = Date then
             ShowMessage(adoqEvent.FieldByName('message').AsString);
+
           if ((Date - adoqEvent.FieldByName('date_exe').Value) mod adoqEvent.FieldByName('repet').Value) = 0 then
             ShowMessage(adoqEvent.FieldByName('message').AsString);
+
           adoqEvent.Next;
         end;
     end;
@@ -1081,22 +1174,27 @@ begin
       adoqVirtualD.SQL.Append('SELECT name_kat, virtual_sum FROM itog');
       adoqVirtualD.SQL.Append('WHERE virtual_sum < 0 and id_kat is null');
       adoqVirtualD.Open;
+
       adoqVirtualD.Active := true;
       Series1.Clear;
       i := 1;
+
       while not (adoqVirtualD.Eof) do
         begin
           Series1.Add(- adoqVirtualD.FieldByName('virtual_sum').Value, adoqVirtualD.FieldByName('name_kat').AsString, clColor[i]);
           adoqVirtualD.Next;
           inc(i);
         end;
+
       adoqRealD.SQL.Clear;
       adoqRealD.SQL.Append('SELECT name_kat, real_sum FROM itog');
       adoqRealD.SQL.Append('WHERE real_sum < 0 and id_kat is null');
       adoqRealD.Open;
+
       adoqRealD.Active := true;
       Series2.Clear;
       i := 1;
+
       while not (adoqRealD.Eof) do
         begin
           Series2.Add(- adoqRealD.FieldByName('real_sum').Value, adoqRealD.FieldByName('name_kat').AsString, clColor[i]);
@@ -1117,6 +1215,7 @@ begin
       adoqOtchet.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
       adoqOtchet.Open;
     end;
+
   VivodExcel('Прогнозы за ');
 end;
 
@@ -1129,6 +1228,7 @@ begin
   XLApp.Visible := false;
   XLApp.Workbooks.Add(-4167);
   XLApp.Workbooks[1].WorkSheets[1].Name := str + cobMonth.Text + ' ' + spGod.Text;
+
   Colum := XLApp.Workbooks[1].WorkSheets[1].Columns;
   Colum.Columns[1].ColumnWidth := 9;
   Colum.Columns[2].ColumnWidth := 15;
@@ -1136,6 +1236,7 @@ begin
   Colum.Columns[4].ColumnWidth := 11.29;
   Colum.Columns[5].ColumnWidth := 11.29;
   Colum.Columns[6].ColumnWidth := 11.29;
+
   Sheet:=XLApp.Workbooks[1].WorkSheets[1];
   XLApp.Selection.WrapText := true;
   Sheet.Cells[1, 1]:='Дата';
@@ -1144,6 +1245,7 @@ begin
   Sheet.Cells[1, 4]:='Сумма';
   Sheet.Cells[1, 5]:='Кошелек';
   Sheet.Cells[1, 6]:='Комментарий';
+
   index:=2;
   XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 6]].Select;
   XLApp.Selection.WrapText := true;
@@ -1153,6 +1255,7 @@ begin
   with dmCash do
     begin
       adoqOtchet.First;
+
       while not (adoqOtchet.Eof) do
         begin
           Sheet.Cells[index,1] := adoqOtchet.FieldByName('date_v').AsString;
@@ -1168,16 +1271,19 @@ begin
 
   Sheet.Cells[index, 3] := 'ИТОГО:';
   Sheet.Cells[index, 4].Formula := '=sum(D2:D' + IntToStr(index - 1) + ')';
+
   XLApp.Range[XLApp.Cells[index, 1], XLApp.Cells[index, 3]].Select;
   XLApp.Selection.Merge;
   XLApp.Selection.HorizontalAlignment := -4152;
+
   inc(index);
-  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[index-1, 6]].Select;
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[index - 1, 6]].Select;
   XLApp.Selection.Borders.LineStyle := 1;
   XLApp.Selection.Borders.Weight := 2;
   XLApp.Selection.WrapText := true;
   XLApp.Selection.Font.Size := 10;
   XLApp.Selection.Font.Name := 'Times New Roman';
+
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.Orientation := 1;
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.LeftMargin := 15;
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.RightMargin := 15;
@@ -1201,6 +1307,7 @@ begin
       adoqOtchet.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
       adoqOtchet.Open;
     end;
+
   VivodExcel('Расходы за ');
 end;
 
@@ -1216,6 +1323,7 @@ begin
       adoqOtchet.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
       adoqOtchet.Open;
     end;
+
   ExcelOthet;
 end;
 
@@ -1228,13 +1336,16 @@ begin
   XLApp.Visible := false;
   XLApp.Workbooks.Add(-4167);
   XLApp.Workbooks[1].WorkSheets[1].Name := 'Данные за ' + cobMonth.Text + ' ' + spGod.Text;
+
   Colum := XLApp.Workbooks[1].WorkSheets[1].Columns;
   Colum.Columns[1].ColumnWidth := 15;
   Colum.Columns[2].ColumnWidth := 9;
+
   Sheet:=XLApp.Workbooks[1].WorkSheets[1];
   XLApp.Selection.WrapText := true;
   Sheet.Cells[1, 1]:='Кошелек';
   Sheet.Cells[1, 2]:='Сумма';
+
   index:=2;
   XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 2]].Select;
   XLApp.Selection.WrapText := true;
@@ -1244,6 +1355,7 @@ begin
   with dmCash do
     begin
       adoqOtchet.First;
+
       while not (adoqOtchet.Eof) do
         begin
           Sheet.Cells[index,1] := adoqOtchet.FieldByName('koshel').AsString;
@@ -1255,12 +1367,14 @@ begin
 
   Sheet.Cells[index, 1] := 'ИТОГО:';
   Sheet.Cells[index, 2].Formula := '=sum(B2:B' + IntToStr(index - 1) + ')';
+
   XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[index, 2]].Select;
   XLApp.Selection.Borders.LineStyle := 1;
   XLApp.Selection.Borders.Weight := 2;
   XLApp.Selection.WrapText := true;
   XLApp.Selection.Font.Size := 10;
   XLApp.Selection.Font.Name := 'Times New Roman';
+  
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.Orientation := 1;
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.LeftMargin := 15;
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.RightMargin := 15;
@@ -1301,6 +1415,7 @@ begin
         adoqCopy.SQL.Append('INSERT INTO virtual_pokup');
         adoqCopy.SQL.Append('(month_v, date_v, id_prod, sum_d, koshel, comment, kol)');
         adoqCopy.SQL.Append('VALUES(:m_v, :d_v, :i_p, :s_d, :kos, :com, :kl)');
+
         adoqCopy.Parameters.ParamByName('m_v').Value := cobMonth.Text + ' ' + spGod.Text;
         adoqCopy.Parameters.ParamByName('d_v').Value := IncDay(StrToDate(Date_data));
         adoqCopy.Parameters.ParamByName('i_p').Value := adoqVirtual.FieldByName('id_prod').Value;
@@ -1308,10 +1423,22 @@ begin
         adoqCopy.Parameters.ParamByName('kos').Value := adoqVirtual.FieldByName('koshel').Value;
         adoqCopy.Parameters.ParamByName('com').Value := adoqVirtual.FieldByName('comment').Value;
         adoqCopy.Parameters.ParamByName('kl').Value := adoqVirtual.FieldByName('kol').Value;
+
         adoqCopy.ExecSQL;
+
         VivodData;
         SummaDate;
       end;
+end;
+
+procedure TfMainCash.nGoalClick(Sender: TObject);
+begin
+  fCashGoal.ShowModal;
+end;
+
+procedure TfMainCash.nCarExpenClick(Sender: TObject);
+begin
+  fCarExpen.ShowModal;
 end;
 
 end.

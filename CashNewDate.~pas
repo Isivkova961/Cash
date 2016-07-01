@@ -67,7 +67,6 @@ begin
           adoqCopy.ExecSQL;
           adoqDataCopy.Next;
         end;
-
     end;
   Close;
 end;

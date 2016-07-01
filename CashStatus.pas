@@ -49,6 +49,7 @@ type
       const HitInfo: THitInfo);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure EditYN(y_n: boolean);
 
   private
     { Private declarations }
@@ -78,9 +79,12 @@ uses CashDM, CachMain;
 procedure TfStatus.FormShow(Sender: TObject);
 begin
   LoadTable;
+
   LoadData('WHERE f_show = false and the_end = false');
+
   dbgStatus.EvenRowColor := RGB(214,254,252); //цвет фона голубой
   dbgStatus.OddRowColor := RGB(254,254,214);  //цвет фона желтый
+
   LoadDrevo;
 end;
 
@@ -89,22 +93,28 @@ begin
   with dmCash do
     begin
       adoqRashod.SQL.Clear;
+
       adoqRashod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqRashod.SQL.Append('WHERE d_r = false');
       adoqRashod.SQL.Append('ORDER BY name_kat ASC');
+
       adoqRashod.Open;
     end;
+
   cobName.Clear;
+
   with dmCash.adoqRashod do
     begin
       DisableControls;
       cobName.Items.BeginUpdate;
       First;
+
       while not Eof do
         begin
           cobName.Items.Add(FieldByName('name_kat').AsString);
           Next;
         end;
+
       cobName.Items.EndUpdate;
       EnableControls;
     end;
@@ -114,6 +124,7 @@ procedure TfStatus.cobNameChange(Sender: TObject);
 begin
   if cobName.Text <> '' then
     cebName.Checked := true;
+
   FilterBase;
 end;
 
@@ -121,6 +132,7 @@ procedure TfStatus.deDatePokupChange(Sender: TObject);
 begin
   if pos(' ', deDatePokup.Text) = 0 then
     cebDatePokup.Checked := true;
+
   FilterBase;
 end;
 
@@ -128,6 +140,7 @@ procedure TfStatus.cebYesStatusClick(Sender: TObject);
 begin
   if cebYesStatus.Checked = true then
     cebStatus.Checked := true;
+
   FilterBase;
 end;
 
@@ -135,6 +148,7 @@ procedure TfStatus.cebDatePokupClick(Sender: TObject);
 begin
   if cebDatePokup.Checked = false then
     deDatePokup.Text := '';
+
   FilterBase;
 end;
 
@@ -142,6 +156,7 @@ procedure TfStatus.cebNameClick(Sender: TObject);
 begin
   if cebName.Checked = false then
     cobName.ItemIndex := - 1;
+
   FilterBase;
 end;
 
@@ -151,6 +166,7 @@ begin
     LoadData('')
   else
     LoadData('WHERE f_show = false');
+
   FilterBase;
 end;
 
@@ -158,6 +174,7 @@ procedure TfStatus.cebStatusClick(Sender: TObject);
 begin
   if cebStatus.Checked = false then
     cebYesStatus.Checked := false;
+
   FilterBase;
 end;
 
@@ -175,25 +192,30 @@ var
           s := s + 'date_pokup = ' + #39 + deDatePokup.Text + #39
         else
           s := s + ' and date_pokup = ' + #39 + deDatePokup.Text + #39;
+
     if cebName.Checked then
       if cobName.Text <> '' then
         if s = '' then
           s := s + 'name_pokup = ' + #39 + cobName.Text + #39
         else
           s := s + ' and name_pokup = ' + #39 + cobName.Text + #39;
+
     if cebYesStatus.Checked then
       stat := 'true'
     else
       stat := 'false';
+
     if cebStatus.Checked then
       if s = '' then
         s := s + 'the_end = ' + stat
       else
         s := s + ' and the_end = ' + stat;
+
     str := s;
   end;
 begin
   Filteretion(Filtr);
+
   with dmCash do
     begin
       adoqStatus.Filter := Filtr;
@@ -207,8 +229,10 @@ begin
   with dmCash do
     begin
       adoqStatus.SQL.Clear;
+
       adoqStatus.SQL.Append('SELECT * FROM status_pokup');
       adoqStatus.SQL.Append(str);
+
       adoqStatus.Open;
     end;
 end;
@@ -219,13 +243,13 @@ begin
   if dmCash.adoqStatus.RecordCount > 0 then
     if Key = 13 then
       begin
-        dbgStatus.Options := dbgStatus.Options - [dgRowSelect];
-        dbgStatus.Options := dbgStatus.Options + [dgEditing];
-        dbgStatus.ReadOnly := false;
+        EditYN(true);
+
         with dmCash.adoqStatus do
           begin
             Edit;
             Post;
+
             if dbgStatus.SelectedIndex = 5 then
               begin
                 LoadData('WHERE f_show = false');
@@ -233,17 +257,18 @@ begin
               end;
           end;
       end;
+
   if Key = 45 then
     begin
-      dbgStatus.Options := dbgStatus.Options - [dgRowSelect];
-      dbgStatus.Options := dbgStatus.Options + [dgEditing];
-      dbgStatus.ReadOnly := false;
+      EditYN(true);
+
       with dmCash.adoqStatus do
         begin
           Insert;
           Post;
         end;
     end;
+
   if dmCash.adoqStatus.RecordCount > 0 then
     if key = 46 then
       if MessageDlg('Вы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
@@ -258,16 +283,19 @@ begin
   if dbgStatus.SelectedIndex = 3 then
     begin
       dmCash.adoqStatus.Edit;
+
       if dbgStatus.SelectedField.Value = false then
         begin
           dbgStatus.SelectedIndex := dbgStatus.SelectedIndex + 1;
           dbgStatus.SelectedField.Value := Date;
+
           with dmCash do
             begin
               adoqSpisok.SQL.Clear;
               adoqSpisok.SQL.Append('SELECT * FROM spisok_pokup');
               adoqSpisok.SQL.Append('ORDER BY name_pokup ASC');
               adoqSpisok.Open;
+
               if adoqSpisok.Locate('name_pokup',adoqStatus.FieldByName('name_pokup').AsString,[]) = false then
                 begin
                   adoqSpisok.Insert;
@@ -288,8 +316,7 @@ end;
 
 procedure TfStatus.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  dbgStatus.Options := dbgStatus.Options + [dgRowSelect];
-  dbgStatus.ReadOnly := true;
+  EditYN(false);
 end;
 
 procedure TfStatus.vsgStatusGetText(Sender: TBaseVirtualTree;
@@ -299,6 +326,7 @@ var
   Data: PvtWinfo;
 begin
   Data := Sender.GetNodeData(Node);
+
   if Assigned(Data) then
     CellText := Data.tname;
 end;
@@ -309,6 +337,7 @@ var
   Data: PvtWinfo;
 begin
   Data := Sender.GetNodeData(Node);
+
   if Assigned(Data) then
      Finalize(Data^);
 end;
@@ -344,18 +373,23 @@ begin
   prod_id := TStringList.Create;
   prod_id.Sorted := true;
   prod_id.Duplicates := dupIgnore;
+
   with dmCash do
     begin
       LoadData('WHERE f_show = false');
+
       adoqStatus.First;
+
       while not (adoqStatus.Eof) do
         begin
           for i := 0 to fMainCash.id_prod[1].Count - 1 do
             if (pos(' ' + adoqStatus.FieldByName('id_prod').AsString + ',', fMainCash.id_prod[2][i]) > 0)
                 OR (fMainCash.id_prod[1][i] = adoqStatus.FieldByName('id_prod').AsString) then
               prod_id.Append(fMainCash.id_prod[1][i]);
+
           adoqStatus.Next;
         end;
+
       for i := 0 to prod_id.Count - 1 do
         begin
           if iid_prod = ''  then
@@ -363,6 +397,7 @@ begin
           else
             iid_prod := iid_prod + ',' + prod_id[i];
         end;
+
       if iid_prod <> '' then
         begin
           adoqSpravoch.SQL.Clear;
@@ -374,33 +409,39 @@ begin
 
       vsgStatus.Clear;
       vsgStatus.BeginUpdate;
+
       with dmCash do
-      begin
-        //Строим дерево на основе данных из итоговой таблицы
-        while not (adoqSpravoch.EOF) do
-          begin
-            if adoqSpravoch.FieldByName('id_kat').Value = null then
-              begin
-                node := vsgStatus.addChild(NIL);
-              end
-            else
-              begin
-                node1 := vsgStatus.GetFirst();
-                while (node1 <> nil) do
-                  begin
-                    Data := vsgStatus.GetNodeData(node1);
-                    if (Assigned(Data)) and (Data.ID = adoqSpravoch.FieldByName('id_kat').Value) then
-                      begin
-                        node := vsgStatus.addChild(node1);
-                        break;
-                      end;
-                    node1 := vsgStatus.GetNext(node1);
-                  end;
-              end;
-            initNode(node);
-            adoqSpravoch.Next;
-          end;
-      end;
+        begin
+          //Строим дерево на основе данных из итоговой таблицы
+          while not (adoqSpravoch.EOF) do
+            begin
+              if adoqSpravoch.FieldByName('id_kat').Value = null then
+                begin
+                  node := vsgStatus.addChild(NIL);
+                end
+              else
+                begin
+                  node1 := vsgStatus.GetFirst();
+
+                  while (node1 <> nil) do
+                    begin
+                      Data := vsgStatus.GetNodeData(node1);
+
+                      if (Assigned(Data)) and (Data.ID = adoqSpravoch.FieldByName('id_kat').Value) then
+                        begin
+                          node := vsgStatus.addChild(node1);
+                          break;
+                        end;
+
+                      node1 := vsgStatus.GetNext(node1);
+                    end;
+                end;
+
+              initNode(node);
+              adoqSpravoch.Next;
+            end;
+        end;
+
       vsgStatus.EndUpdate;
     end;
 end;
@@ -414,7 +455,9 @@ var
 begin
   if Assigned(vsgStatus.FocusedNode) then
     Data := vsgStatus.GetNodeData(vsgStatus.FocusedNode);
+
   index := fMainCash.id_prod[1].IndexOf(IntToStr(Data.ID));
+  
   if index <> - 1 then
     begin
       iid_ := fMainCash.id_prod[2][index];
@@ -429,6 +472,24 @@ procedure TfStatus.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = 27 then
     Close;
+end;
+
+procedure TfStatus.EditYN(y_n: boolean);
+begin
+  if y_n = true then
+    begin
+      dbgStatus.Options := dbgStatus.Options - [dgRowSelect];
+      dbgStatus.Options := dbgStatus.Options + [dgEditing];
+
+      dbgStatus.ReadOnly := false;
+    end
+  else
+    begin
+      dbgStatus.Options := dbgStatus.Options + [dgRowSelect];
+      dbgStatus.Options := dbgStatus.Options - [dgEditing];
+
+      dbgStatus.ReadOnly := true;
+    end;
 end;
 
 end.

@@ -57,10 +57,15 @@ type
     adoqDrevo2: TADOQuery;
     adoqCopy: TADOQuery;
     adoqDataCopy: TADOQuery;
+    adoqGoal: TADOQuery;
+    dsGoal: TDataSource;
+    adoqCarExpen: TADOQuery;
+    dsCarExpen: TDataSource;
     procedure adoqLekarAfterInsert(DataSet: TDataSet);
     procedure adoqStatusAfterInsert(DataSet: TDataSet);
     procedure adoqSpisokAfterInsert(DataSet: TDataSet);
     procedure adoqZKHCalcFields(DataSet: TDataSet);
+    procedure adoqGoalAfterInsert(DataSet: TDataSet);
 
   private
     { Private declarations }
@@ -95,6 +100,11 @@ end;
 procedure TdmCash.adoqZKHCalcFields(DataSet: TDataSet);
 begin
   adoqZKHitogo.Value := adoqZKHmean_new.Value - adoqZKHmean_before.Value;
+end;
+
+procedure TdmCash.adoqGoalAfterInsert(DataSet: TDataSet);
+begin
+  adoqGoal.FieldByName('execution').Value := false;
 end;
 
 end.

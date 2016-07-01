@@ -5,7 +5,7 @@ object fSpisokBlud: TfSpisokBlud
   BorderStyle = bsSingle
   Caption = #1057#1087#1080#1089#1086#1082' '#1087#1088#1080#1075#1086#1090#1086#1074#1083#1077#1085#1099#1093' '#1073#1083#1102#1076
   ClientHeight = 378
-  ClientWidth = 337
+  ClientWidth = 412
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -21,7 +21,7 @@ object fSpisokBlud: TfSpisokBlud
   object pBludo1: TPanel
     Left = 0
     Top = 0
-    Width = 337
+    Width = 412
     Height = 41
     Align = alTop
     Color = clGradientActiveCaption
@@ -29,7 +29,7 @@ object fSpisokBlud: TfSpisokBlud
     object tbSpisokBlud: TToolBar
       Left = 1
       Top = 1
-      Width = 335
+      Width = 410
       Height = 29
       Caption = 'tbSpisokBlud'
       Flat = True
@@ -63,7 +63,7 @@ object fSpisokBlud: TfSpisokBlud
   object pBludo2: TPanel
     Left = 0
     Top = 41
-    Width = 337
+    Width = 412
     Height = 296
     Align = alClient
     Color = clGradientInactiveCaption
@@ -71,7 +71,7 @@ object fSpisokBlud: TfSpisokBlud
     object dbgBludo: TDBGridEh
       Left = 1
       Top = 1
-      Width = 335
+      Width = 410
       Height = 294
       Align = alClient
       DataSource = dmCash.dsBludoPr
@@ -104,7 +104,7 @@ object fSpisokBlud: TfSpisokBlud
           Footers = <>
           Title.Alignment = taCenter
           Title.Caption = #1044#1072#1090#1072
-          Width = 113
+          Width = 91
         end
         item
           EditButtons = <>
@@ -112,14 +112,14 @@ object fSpisokBlud: TfSpisokBlud
           Footers = <>
           Title.Alignment = taCenter
           Title.Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077
-          Width = 200
+          Width = 295
         end>
     end
   end
   object pBludo3: TPanel
     Left = 0
     Top = 337
-    Width = 337
+    Width = 412
     Height = 41
     Align = alBottom
     Color = clGradientActiveCaption

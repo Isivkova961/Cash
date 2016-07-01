@@ -1,8 +1,8 @@
 object dmCash: TdmCash
   OldCreateOrder = False
-  Left = 597
-  Top = 211
-  Height = 531
+  Left = 583
+  Top = 451
+  Height = 586
   Width = 480
   object adocCash: TADOConnection
     Connected = True
@@ -344,5 +344,37 @@ object dmCash: TdmCash
     Parameters = <>
     Left = 184
     Top = 368
+  end
+  object adoqGoal: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    AfterInsert = adoqGoalAfterInsert
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM goal')
+    Left = 128
+    Top = 424
+  end
+  object dsGoal: TDataSource
+    DataSet = adoqGoal
+    Left = 176
+    Top = 424
+  end
+  object adoqCarExpen: TADOQuery
+    Active = True
+    Connection = adocCash
+    CursorType = ctStatic
+    OnCalcFields = adoqZKHCalcFields
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM car_expen')
+    Left = 128
+    Top = 472
+  end
+  object dsCarExpen: TDataSource
+    DataSet = adoqCarExpen
+    Left = 176
+    Top = 472
   end
 end

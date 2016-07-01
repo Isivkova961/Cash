@@ -43,20 +43,27 @@ begin
   with dmCash do
     begin
       adoqDataCopy.SQL.Clear;
+
       adoqDataCopy.SQL.Append('SELECT * FROM virtual_pokup');
       adoqDataCopy.SQL.Append('WHERE date_v = :d_v');
+
       adoqDataCopy.Parameters.ParamByName('d_v').Value := StrToDate(fMainCash.Date_data);
+
       adoqDataCopy.Open;
+
       if fMainCash.cobMonth.ItemIndex <> fMainCash.cobMonth.Items.Count - 1 then
         s := fMainCash.cobMonth.Items[fMainCash.cobMonth.ItemIndex + 1] + ' ' + fMainCash.spGod.Text
       else
         s := fMainCash.cobMonth.Items[0] + ' ' + IntToStr(fMainCash.spGod.Value + 1);
+
       while not (adoqDataCopy.Eof) do
         begin
           adoqCopy.SQL.Clear;
+
           adoqCopy.SQL.Append('INSERT INTO virtual_pokup');
           adoqCopy.SQL.Append('(month_v, date_v, id_prod, sum_d, koshel, comment, kol)');
           adoqCopy.SQL.Append('VALUES(:m_v, :d_v, :i_p, :s_d, :kos, :com, :kl)');
+
           adoqCopy.Parameters.ParamByName('m_v').Value := s;
           adoqCopy.Parameters.ParamByName('d_v').Value := deNewDate.Date;
           adoqCopy.Parameters.ParamByName('i_p').Value := adoqDataCopy.FieldByName('id_prod').Value;
@@ -64,10 +71,12 @@ begin
           adoqCopy.Parameters.ParamByName('kos').Value := adoqDataCopy.FieldByName('koshel').Value;
           adoqCopy.Parameters.ParamByName('com').Value := adoqDataCopy.FieldByName('comment').Value;
           adoqCopy.Parameters.ParamByName('kl').Value := adoqDataCopy.FieldByName('kol').Value;
+
           adoqCopy.ExecSQL;
           adoqDataCopy.Next;
         end;
     end;
+    
   Close;
 end;
 

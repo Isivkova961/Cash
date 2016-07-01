@@ -20,7 +20,7 @@ object fCashEvent: TfCashEvent
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 17
-  object Panel1: TPanel
+  object pEvent1: TPanel
     Left = 0
     Top = 0
     Width = 712
@@ -29,7 +29,7 @@ object fCashEvent: TfCashEvent
     Color = clGradientActiveCaption
     TabOrder = 0
   end
-  object Panel2: TPanel
+  object pEvent2: TPanel
     Left = 0
     Top = 41
     Width = 712
@@ -106,7 +106,7 @@ object fCashEvent: TfCashEvent
         end>
     end
   end
-  object Panel3: TPanel
+  object pEvent3: TPanel
     Left = 0
     Top = 401
     Width = 712

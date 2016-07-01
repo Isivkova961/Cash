@@ -3,7 +3,7 @@ object fMainCash: TfMainCash
   Top = 189
   Width = 1037
   Height = 680
-  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.3)'
+  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.4)'
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -848,6 +848,10 @@ object fMainCash: TfMainCash
         Caption = #1057#1087#1080#1089#1086#1082' '#1073#1083#1102#1076
         OnClick = nBludoClick
       end
+      object nCarExpen: TMenuItem
+        Caption = #1056#1077#1084#1086#1085#1090' '#1084#1072#1096#1080#1085#1099
+        OnClick = nCarExpenClick
+      end
     end
     object nOtchet: TMenuItem
       Caption = #1054#1090#1095#1077#1090#1099
@@ -871,6 +875,10 @@ object fMainCash: TfMainCash
     object nPayMent: TMenuItem
       Caption = #1054#1087#1083#1072#1090#1072' '#1046#1050#1061
       OnClick = nPayMentClick
+    end
+    object nGoal: TMenuItem
+      Caption = #1062#1077#1083#1080
+      OnClick = nGoalClick
     end
   end
   object ilCash: TImageList

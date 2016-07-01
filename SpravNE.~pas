@@ -46,6 +46,7 @@ procedure TfSpravNE.FormShow(Sender: TObject);
 begin
   LoadTable;
   NewEditData;
+  cobKateg.SetFocus;
 end;
 
 procedure TfSpravNE.LoadTable;
@@ -202,7 +203,9 @@ procedure TfSpravNE.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if key = 13 then
-    bSave.Click;  
+    bSave.Click;
+  if Key = 27 then
+    Close;
 end;
 
 end.

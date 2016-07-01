@@ -1,0 +1,135 @@
+unit CashGoal;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, GridsEh, DBGridEh, ExtCtrls, StdCtrls;
+
+type
+  TfCashGoal = class(TForm)
+    pGoal1: TPanel;
+    pGoal2: TPanel;
+    pGoal3: TPanel;
+    dbgGoal: TDBGridEh;
+    cebOpenExe: TCheckBox;
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgGoalKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure cebOpenExeClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure LoadData;
+    procedure EditYN(y_n: boolean);
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  fCashGoal: TfCashGoal;
+
+implementation
+
+uses CashDM;
+
+{$R *.dfm}
+
+procedure TfCashGoal.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 27 then
+    Close;
+end;
+
+procedure TfCashGoal.dbgGoalKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  //если нажата клавиша Enter
+  if dmCash.adoqGoal.RecordCount > 0 then
+    if Key = 13 then
+      begin
+        EditYN(true);
+
+        with dmCash do
+          begin
+            adoqGoal.Edit;  //» сохран€ем их в таблицу
+            adoqGoal.Post;
+          end;
+      end;
+
+  if Key = 45 then     //если нажата клавиша Insert
+    begin
+      EditYN(true);
+
+      with dmCash do
+        begin
+          adoqGoal.Insert;  //и сохран€ем их в таблицу
+          adoqGoal.Post;
+        end;
+    end;
+
+  if dmCash.adoqGoal.RecordCount > 0 then
+    if Key = 46 then                //≈сли нажата клавиша Delete
+      if MessageDlg('¬ы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
+        dmCash.adoqGoal.Delete;
+end;
+
+procedure TfCashGoal.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  EditYN(false);
+end;
+
+procedure TfCashGoal.cebOpenExeClick(Sender: TObject);
+begin
+  LoadData;
+end;
+
+procedure TfCashGoal.FormShow(Sender: TObject);
+begin
+  LoadData;
+
+  dbgGoal.EvenRowColor := RGB(214,254,252); //цвет фона голубой
+  dbgGoal.OddRowColor := RGB(254,254,214);  //цвет фона желтый
+end;
+
+//ѕроцедура загрузки данных по цел€м
+procedure TfCashGoal.LoadData;
+begin
+  //¬ зависимости от постановки галочки, показывать выполненые
+  //или не выполненые
+  with dmCash do
+    begin
+      adoqGoal.SQL.Clear;
+
+      adoqGoal.SQL.Append('SELECT * FROM goal');
+      adoqGoal.SQL.Append('WHERE execution = :exe');
+
+      adoqGoal.Parameters.ParamByName('exe').Value := cebOpenExe.Checked;
+
+      adoqGoal.Open;
+    end;
+end;
+
+procedure TfCashGoal.EditYN(y_n: boolean);
+begin
+  if y_n = true then
+    begin
+      dbgGoal.Options := dbgGoal.Options - [dgRowSelect];  //то даем возможность редактировать данные
+      dbgGoal.Options := dbgGoal.Options + [dgEditing];
+
+      dbgGoal.ReadOnly := false;
+    end
+  else
+    begin
+      dbgGoal.Options := dbgGoal.Options + [dgRowSelect];  //то убираем возможность редактировать данные
+      dbgGoal.Options := dbgGoal.Options - [dgEditing];
+      
+      dbgGoal.ReadOnly := true;
+    end;
+end;
+
+end.

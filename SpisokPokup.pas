@@ -43,6 +43,7 @@ uses CashDM;
 procedure TfSpisokPokup.FormShow(Sender: TObject);
 begin
   LoadData('WHERE status = false');
+
   dbgSpisok.EvenRowColor := RGB(214,254,252);
   dbgSpisok.OddRowColor := RGB(254,254,214);
 end;
@@ -52,10 +53,12 @@ begin
   with dmCash do
     begin
       adoqSpisok.SQL.Clear;
+
       adoqSpisok.SQL.Append('SELECT name_pokup, status');
       adoqSpisok.SQL.Append('FROM spisok_pokup');
       adoqSpisok.SQL.Append(str);
       adoqSpisok.SQL.Append('ORDER BY name_pokup');
+
       adoqSpisok.Open;
     end;
 end;
@@ -71,9 +74,11 @@ begin
             Edit;
             Post;
           end;
+
         if cebOpen.Checked = false then
           LoadData('WHERE status = false');
       end;
+
   if dmCash.adoqSpisok.RecordCount > 0 then
     if Key = 46 then
       if MessageDlg('Вы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
@@ -86,6 +91,7 @@ begin
     LoadData('WHERE status = true')
   else
     LoadData('WHERE status = false');
+
     //Изменение размеров столбцов dbgSpisok в зависимости от размеров самого dbgSpisok
   dbgSpisok.Columns[0].Width := round(dbgSpisok.Width * 7 / 10) - 15;
   dbgSpisok.Columns[1].Width := round(dbgSpisok.Width * 3 / 10) - 15;
@@ -99,22 +105,24 @@ begin
 end;
 
 procedure TfSpisokPokup.nExcelClick(Sender: TObject);
-var DateB: TDate;
-    XLApp, Sheet, Colum: Variant;
-    index, i: Integer;
-    str, st: string;
+var
+  XLApp, Sheet, Colum: Variant;
+  index: Integer;
 begin
   XLApp:=CreateOleObject('Excel.Application');
   XLApp.Visible := false;
   XLApp.Workbooks.Add(-4167);
   XLApp.Workbooks[1].WorkSheets[1].Name := 'Список покупок';
+
   Colum := XLApp.Workbooks[1].WorkSheets[1].Columns;
   Colum.Columns[1].ColumnWidth := 28.86;
   Colum.Columns[2].ColumnWidth := 11.29;
+
   Sheet:=XLApp.Workbooks[1].WorkSheets[1];
   XLApp.Selection.WrapText := true;
   Sheet.Cells[1, 1]:='Список покупок';
   Sheet.Cells[1, 2]:='Куплен';
+
   index:=2;
   XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 2]].Select;
   XLApp.Selection.WrapText := true;
@@ -124,6 +132,7 @@ begin
   with dmCash do
     begin
       adoqSpisok.First;
+
       while not (adoqSpisok.Eof) do
         begin
           Sheet.Cells[index,1] := adoqSpisok.FieldByName('name_pokup').AsString;
@@ -138,6 +147,7 @@ begin
   XLApp.Selection.WrapText := true;
   XLApp.Selection.Font.Size := 10;
   XLApp.Selection.Font.Name := 'Times New Roman';
+
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.Orientation := 1;
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.LeftMargin := 15;
   XLApp.WorkBooks[1].WorkSheets[1].PageSetup.RightMargin := 15;

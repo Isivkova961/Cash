@@ -89,13 +89,17 @@ begin
   with dmCash do
     begin
       adoqDohod.SQL.Clear;
+
       adoqDohod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqDohod.SQL.Append('WHERE d_r = true');
+
       adoqDohod.Open;
 
       adoqRashod.SQL.Clear;
+
       adoqRashod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqRashod.SQL.Append('WHERE d_r = false');
+
       adoqRashod.Open;
     end;
 end;
@@ -107,6 +111,7 @@ var
   Data: PvtWinfo;
 begin
   Data := Sender.GetNodeData(Node);
+
   if Assigned(Data) then
     CellText := Data.tname;
 end;
@@ -118,6 +123,7 @@ var
   Data: PvtWinfo;
 begin
   Data := Sender.GetNodeData(Node);
+
   if Assigned(Data) then
     CellText := Data.tname;
 end;
@@ -128,6 +134,7 @@ var
   Data: PvtWinfo;
 begin
   Data := Sender.GetNodeData(Node);
+
   if Assigned(Data) then
      Finalize(Data^);
 end;
@@ -138,6 +145,7 @@ var
   Data: PvtWinfo;
 begin
   Data := Sender.GetNodeData(Node);
+
   if Assigned(Data) then
      Finalize(Data^);
 end;
@@ -176,6 +184,7 @@ begin
   vstDohod.NodeDataSize := SizeOf(RvtWinfo);
   //выделение пам€ти под структуру
   vstRashod.NodeDataSize := SizeOf(RvtWinfo);
+
   for i := 1 to 2 do
     id_prod[i] := TStringList.Create;
 end;
@@ -183,77 +192,88 @@ end;
 //создание дерева
 procedure TfSprav.VivodData;
 var
-  i: Byte;
   node,node1: PVirtualNode;
   Data: PvtWinfo;
-  iid: array of integer;
-  index: integer;
-
 begin
   vstDohod.Clear;
   vstDohod.BeginUpdate;
+
   with dmCash do
     begin
       adoqDohod.First;
+
       //—троим дерево на основе данных из итоговой таблицы
       while not (adoqDohod.EOF) do
-      begin
-        if adoqDohod.FieldByName('id_kat').Value = null then
-          begin
-            node := vstDohod.addChild(NIL);
-          end
-        else
-          begin
-            node1 := vstDohod.GetFirst();
-            while (node1 <> nil) do
-              begin
-                Data := vstDohod.GetNodeData(node1);
-                if (Assigned(Data)) and (Data.ID = adoqDohod.FieldByName('id_kat').Value) then
-                  begin
-                    node := vstDohod.addChild(node1);
-                    break;
-                  end;
-                node1 := vstDohod.GetNext(node1);
-              end;
-          end;
-        initNodeD(node);
-        adoqDohod.Next;
-      end;
+        begin
+          if adoqDohod.FieldByName('id_kat').Value = null then
+            begin
+              node := vstDohod.addChild(NIL);
+            end
+          else
+            begin
+              node1 := vstDohod.GetFirst();
+
+              while (node1 <> nil) do
+                begin
+                  Data := vstDohod.GetNodeData(node1);
+
+                  if (Assigned(Data)) and (Data.ID = adoqDohod.FieldByName('id_kat').Value) then
+                    begin
+                      node := vstDohod.addChild(node1);
+                      break;
+                    end;
+
+                  node1 := vstDohod.GetNext(node1);
+                end;
+            end;
+
+          initNodeD(node);
+          adoqDohod.Next;
+        end;
     end;
+
   vstDohod.EndUpdate;
 
   //“оже самое дл€ расходов
   vstRashod.Clear;
   vstRashod.BeginUpdate;
+
   with dmCash do
     begin
       adoqRashod.First;
+
       //—троим дерево на основе данных из итоговой таблицы
       while not (adoqRashod.EOF) do
-      begin
-        if adoqRashod.FieldByName('id_kat').Value = null then
-          begin
-            node := vstRashod.addChild(NIL);
-          end
-        else
-          begin
-            node1 := vstRashod.GetFirst();
-            while (node1 <> nil) do
-              begin
-                Data := vstRashod.GetNodeData(node1);
-                if (Assigned(Data)) and (Data.ID = adoqRashod.FieldByName('id_kat').Value) then
-                  begin
-                    node := vstRashod.addChild(node1);
-                    break;
-                  end;
-                node1 := vstRashod.GetNext(node1);
-              end;
-          end;
-        initNodeR(node);
-        adoqRashod.Next;
-      end;
+        begin
+          if adoqRashod.FieldByName('id_kat').Value = null then
+            begin
+              node := vstRashod.addChild(NIL);
+            end
+          else
+            begin
+              node1 := vstRashod.GetFirst();
+
+              while (node1 <> nil) do
+                begin
+                  Data := vstRashod.GetNodeData(node1);
+
+                  if (Assigned(Data)) and (Data.ID = adoqRashod.FieldByName('id_kat').Value) then
+                    begin
+                      node := vstRashod.addChild(node1);
+                      break;
+                    end;
+
+                  node1 := vstRashod.GetNext(node1);
+                end;
+            end;
+
+          initNodeR(node);
+          adoqRashod.Next;
+        end;
     end;
+
   vstRashod.EndUpdate;
+
   if bDoh_Rosh = true then
     vstDohod.FocusedNode := vstDohod.GetFirst()
   else
@@ -280,13 +300,13 @@ begin
     bDoh_Rosh := true
   else
     bDoh_Rosh := false;
+
   ButEnabled;
 end;
 
 procedure TfSprav.tbEditClick(Sender: TObject);
 var
   Data: PvtWinfo;
-  node: PVirtualNode;
 begin
   if bDoh_Rosh = true then
     begin
@@ -308,8 +328,10 @@ begin
           id_kat := Data.pID;
         end;
     end;
+
   bNew_Edit := false;
   fSpravNE.ShowModal;
+
   LoadTable;
   VivodData;
   ButEnabled;
@@ -320,6 +342,7 @@ procedure TfSprav.tbNewClick(Sender: TObject);
 begin
   bNew_Edit := true;
   fSpravNE.ShowModal;
+
   LoadTable;
   VivodData;
   ButEnabled;
@@ -330,6 +353,7 @@ procedure TfSprav.tbDeleteClick(Sender: TObject);
 begin
   if MessageDlg('¬ы уверены что хотите удалить?', mtWarning, mbOkCancel, 0) = mrOk then
     DeleteRow;
+
   LoadTable;
   VivodData;
   ButEnabled;
@@ -339,9 +363,8 @@ end;
 procedure TfSprav.DeleteRow;
 var
   Data: PvtWinfo;
-  node: PVirtualNode;
-  i, j, k: integer;
-  del_id, id_sp: string;
+  i: integer;
+  del_id: string;
 begin
   if bDoh_Rosh = true then
     begin
@@ -353,11 +376,14 @@ begin
       Data := vstRashod.GetNodeData(vstRashod.FocusedNode);
       iid_sp := Data.ID;
     end;
+
   with dmCash do
     begin
       i := id_prod[1].IndexOf(IntToStr(iid_sp));
+
       if i > - 1 then
         del_id := IntToStr(iid_sp) + ',' + id_prod[2][i];
+
       delete(del_id, length(del_id), 1);
       adoqSpravData.SQL.Text := 'DELETE FROM sprav_pokup WHERE id in (' + del_id + ')';
       adoqSpravData.ExecSQL;
@@ -374,9 +400,11 @@ procedure TfSprav.vstDohodKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = 45 then
     tbNew.Click;
+
   if Key = 13 then
     if tbEdit.Enabled then
       tbEdit.Click;
+
   if Key = 46 then
     if tbDelete.Enabled then
       tbDelete.Click;
@@ -420,6 +448,7 @@ var
 begin
   for i := 1 to 2 do
     id_prod[i].Clear;
+
   with dmCash do
     begin
       adoqDrevo2.SQL.Text := 'SELECT * FROM sprav_pokup';
@@ -431,48 +460,58 @@ begin
           id_prod[2].Append('');
           adoqDrevo2.Next;
         end;
+
       for j:=0 to id_prod[1].Count - 1 do
         begin
           adoqDrevo2.Filter := 'id_kat = ' + id_prod[1][j];
           adoqDrevo2.Filtered := true;
           adoqDrevo2.First;
+
           while not (adoqDrevo2.Eof) do
             begin
               s := ' ';
               id_prod[2][j] := id_prod[2][j] + s + adoqDrevo2.FieldByName('id').AsString + ',';
               adoqDrevo2.Next;
             end;
+
           adoqDrevo2.Filtered := false;
         end;
     end;
 
   j := 0;
+
   while j < id_prod[1].Count - 1 do
     begin
       s := id_prod[2][j];
+
       if s = '' then
         j := j + 1
       else
         begin
           if s <> '' then
             delete(s, 1, 1);
+
           while length(s) > 0 do
             begin
               if pos(', ', s) > 0 then
                 s1 := copy(s, 1, pos(', ', s) - 1)
               else
                 s1 := copy(s, 1, pos(',', s) - 1);
+
               delete(s, 1, length(s1) + 2);
               i := id_prod[1].IndexOf(s1);
+
               if id_prod[2][i] <> '' then
                 begin
                   id_prod[2][j] := id_prod[2][j] + id_prod[2][i];
+
                   if s <> '' then
                     s := s + ' ';
-                  s := s + copy(id_prod[2][i], 2, length(id_prod[2][i]));
 
+                  s := s + copy(id_prod[2][i], 2, length(id_prod[2][i]));
                 end;
             end;
+
           j := j + 1;
         end;
     end;
@@ -484,9 +523,11 @@ procedure TfSprav.vstRashodKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = 45 then
     tbNew.Click;
+
   if Key = 13 then
     if tbEdit.Enabled then
       tbEdit.Click;
+      
   if Key = 46 then
     if tbDelete.Enabled then
       tbDelete.Click;
