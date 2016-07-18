@@ -46,12 +46,8 @@ type
     dbgVirtual: TDBGridEh;
     nStatus: TMenuItem;
     nPokup: TMenuItem;
-    nLekar: TMenuItem;
-    sbLekar: TSpeedButton;
     sbStatus: TSpeedButton;
     sbSpisokPokup: TSpeedButton;
-    nBludo: TMenuItem;
-    sbSpisokBlud: TSpeedButton;
     cVirtual: TDBChart;
     Series1: TPieSeries;
     DBChart1: TDBChart;
@@ -62,10 +58,7 @@ type
     nViewSpisok: TMenuItem;
     nOtchetKoshel: TMenuItem;
     nEvent: TMenuItem;
-    nPayMent: TMenuItem;
     nCopyDate: TMenuItem;
-    nGoal: TMenuItem;
-    nCarExpen: TMenuItem;
     nYearR: TMenuItem;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
@@ -500,7 +493,7 @@ begin
   month_ := cobMonth.Text;
   delete(month_, pos(' ', month_), length(month_));
 
-  sgData.Cells[0, 1] := 'День недели';
+  sgData.Cells[0, 1] := 'Д.нед.';
   sgData.Cells[1, 1] := 'День';
   sgData.Cells[2, 1] := 'Расход';
   sgData.Cells[3, 1] := 'Доход';
@@ -739,17 +732,13 @@ end;
 //Нажатие в меню кнопки новый
 procedure TfMainCash.nNewClick(Sender: TObject);
 begin
-  bNew_Edit := true;
-  fCashDetail.ShowModal;
-  VivodData;
+  tbNew.Click;
 end;
 
 //Нажатие в меню кнопки редактировать
 procedure TfMainCash.nEditClick(Sender: TObject);
 begin
-  bNew_Edit := false;
-  fCashDetail.ShowModal;
-  VivodData;
+  tbEdit.Click;
 end;
 
 //Вывод данных из таблиц расходов и прогнозов
@@ -982,23 +971,25 @@ end;
 //Нажатие в меню на кноку удалить
 procedure TfMainCash.nDeleteClick(Sender: TObject);
 begin
-  if MessageDlg('Вы уверены что хотите удалить?',mtWarning,mbOkCancel,0) = mrOk then
-    DeleteRow;
-
-  VivodData;
-  SummaDate;
+  tbDelete.Click;
 end;
 
 procedure TfMainCash.tbNewClick(Sender: TObject);
+var
+  fCashDetail: TfCashDetail;
 begin
   bNew_Edit := true;
+  fCashDetail := tFCashDetail.Create(Application);
   fCashDetail.ShowModal;
   VivodData;
 end;
 
 procedure TfMainCash.tbEditClick(Sender: TObject);
+var
+  fCashDetail: TfCashDetail;
 begin
   bNew_Edit := false;
+  fCashDetail := tFCashDetail.Create(Application);
   fCashDetail.ShowModal;
   VivodData;
 end;
@@ -1081,20 +1072,21 @@ end;
 
 procedure TfMainCash.dbgRealDblClick(Sender: TObject);
 begin
-  bNew_Edit := false;
-  fCashDetail.ShowModal;
-  VivodData;  
+  if dmCash.adoqReal.RecordCount > 0 then
+    tbEdit.Click;
 end;
 
 procedure TfMainCash.dbgVirtualDblClick(Sender: TObject);
 begin
-  bNew_Edit := false;
-  fCashDetail.ShowModal;
-  VivodData;
+  if dmCash.adoqVirtual.RecordCount > 0 then
+    tbEdit.Click;
 end;
 
 procedure TfMainCash.sbSpravClick(Sender: TObject);
+var
+  fSprav: TfSprav;
 begin
+  fSprav := TfSprav.Create(Application);
   fSprav.ShowModal;
 end;
 
@@ -1108,12 +1100,18 @@ begin
 end;
 
 procedure TfMainCash.nStatusClick(Sender: TObject);
+var
+  fStatus: TfStatus;
 begin
+  fStatus := TfStatus.Create(Application);
   fStatus.ShowModal;
 end;
 
 procedure TfMainCash.nPokupClick(Sender: TObject);
+var
+  fSpisokPokup: TfSpisokPokup;
 begin
+  fSpisokPokup := TfSpisokPokup.Create(Application);
   fSpisokPokup.ShowModal;
 end;
 
@@ -1123,12 +1121,18 @@ begin
 end;
 
 procedure TfMainCash.sbStatusClick(Sender: TObject);
+var
+  fStatus: TfStatus;
 begin
-  fStatus.ShowModal;  
+  fStatus := TfStatus.Create(Application);
+  fStatus.ShowModal;
 end;
 
 procedure TfMainCash.sbSpisokPokupClick(Sender: TObject);
+var
+  fSpisokPokup: TfSpisokPokup;
 begin
+  fSpisokPokup := TfSpisokPokup.Create(Application);
   fSpisokPokup.ShowModal;
 end;
 
@@ -1142,7 +1146,7 @@ var
   lekar, goal: string;
 begin
   //Вывод списка лекарств, у которых закончился срок годности
-  with dmCash do
+ { with dmCash do
     begin
       adoqLekar.SQL.Clear;
       adoqLekar.SQL.Append('SELECT * FROM spisok_lekar');
@@ -1174,7 +1178,7 @@ begin
 
       if adoqSpisok.RecordCount > 0 then
         ShowMessage('Имеется список покупок! Пожалуйста посмотрите!');
-    end;
+    end;   }
 
   //Вывод событий
   with dmCash do
@@ -1195,7 +1199,7 @@ begin
     end;
 
   //Вывод целей
-  with dmCash do
+{  with dmCash do
     begin
       adoqGoal.SQL.Text := 'SELECT * FROM goal ORDER BY goal ASC';
       adoqGoal.Open;
@@ -1213,7 +1217,7 @@ begin
           goal := 'На данный момент у Вас есть невыполненные цели:' + #10 + #13 + goal;
           ShowMessage(goal);
         end;
-    end;
+    end;  }
 
 end;
 
@@ -1458,7 +1462,10 @@ begin
 end;
 
 procedure TfMainCash.nEventClick(Sender: TObject);
+var
+  fCashEvent: TfCashEvent;
 begin
+  fCashEvent := TfCashEvent.Create(Application);
   fCashEvent.ShowModal;
 end;
 
@@ -1468,9 +1475,12 @@ begin
 end;
 
 procedure TfMainCash.tbCopyClick(Sender: TObject);
+var
+  fCashNewDate: TfCashNewDate;
 begin
   if MessageDlg('Скопировать данные на следующий месяц?', mtWarning, mbOkCancel, 0) = mrOk then
     begin
+      fCashNewDate := TfCashNewDate.Create(Application);
       fCashNewDate.deNewDate.Date := IncMonth(StrToDate(Date_data));
       fCashNewDate.ShowModal;
     end;

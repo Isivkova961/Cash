@@ -22,21 +22,8 @@ uses
 
 begin
   Application.Initialize;
-  Application.Title := 'Cash 1.5';
+  Application.Title := 'Cash 1.5.1';
   Application.CreateForm(TfMainCash, fMainCash);
-  Application.CreateForm(TfStatus, fStatus);
-  Application.CreateForm(TfSprav, fSprav);
-  Application.CreateForm(TfCashDetail, fCashDetail);
   Application.CreateForm(TdmCash, dmCash);
-  Application.CreateForm(TfSpravNE, fSpravNE);
-  Application.CreateForm(TfSpisokPokup, fSpisokPokup);
-  Application.CreateForm(TfSpisokLekar, fSpisokLekar);
-  Application.CreateForm(TfSpisokBlud, fSpisokBlud);
-  Application.CreateForm(TfBluda, fBluda);
-  Application.CreateForm(TfCashEvent, fCashEvent);
-  Application.CreateForm(TfCashZKH, fCashZKH);
-  Application.CreateForm(TfCashNewDate, fCashNewDate);
-  Application.CreateForm(TfCashGoal, fCashGoal);
-  Application.CreateForm(TfCarExpen, fCarExpen);
   Application.Run;
 end.
