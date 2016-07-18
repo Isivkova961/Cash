@@ -154,9 +154,11 @@ begin
               with dmCash do
                 begin
                   adoqAddBludo.SQL.Clear;
+
                   adoqAddBludo.SQL.Append('INSERT INTO spisok_blud');
                   adoqAddBludo.SQL.Append('(name_bludo, spisok_prod)');
                   adoqAddBludo.SQL.Append('VALUES (:n_b, :s_p)');
+
                   adoqAddBludo.Parameters.ParamByName('n_b').Value := eNameBludo.Text;
 
                   if eProd.Text <> '' then
@@ -174,6 +176,7 @@ begin
             with dmCash do
               begin
                 adoqAddBludo.SQL.Clear;
+
                 adoqAddBludo.SQL.Append('UPDATE spisok_blud');
                 adoqAddBludo.SQL.Append('SET spisok_prod = :s_p');
                 adoqAddBludo.SQL.Append('WHERE id = :iid');
@@ -206,9 +209,12 @@ begin
           with dmCash do
             begin
               adoqAddBludo.SQL.Clear;
+
               adoqAddBludo.SQL.Append('DELETE FROM spisok_blud');
               adoqAddBludo.SQL.Append('WHERE id = :iid');
+
               adoqAddBludo.Parameters.ParamByName('iid').Value := integer(lbNameBludo.Items.Objects[lbNameBludo.ItemIndex]);
+
               adoqAddBludo.ExecSQL;
             end;
 
@@ -236,9 +242,11 @@ begin
           with dmCash do
             begin
               adoqAddBludo.SQL.Clear;
+
               adoqAddBludo.SQL.Append('UPDATE spisok_blud');
               adoqAddBludo.SQL.Append('SET spisok_prod = :s_p');
               adoqAddBludo.SQL.Append('WHERE id = :iid');
+
 
               adoqAddBludo.Parameters.ParamByName('iid').Value := integer(lbNameBludo.Items.Objects[index]);
               adoqAddBludo.Parameters.ParamByName('s_p').Value := prod;
@@ -247,6 +255,7 @@ begin
                 prod := prod + clbSpisokProd.Items[i] + ',';
 
               delete(prod, length(prod), 1);
+
               adoqAddBludo.ExecSQL;
             end;
         end;
@@ -273,12 +282,15 @@ begin
   with dmCash do
     begin
       adoqAddBludo.SQL.Clear;
+
       adoqAddBludo.SQL.Append('INSERT INTO bludo_pr');
       adoqAddBludo.SQL.Append('(date_prig, id_bludo, month_prig)');
       adoqAddBludo.SQL.Append('VALUES (:d_p, :i_b, :m_p)');
+
       adoqAddBludo.Parameters.ParamByName('d_p').Value := fMainCash.Date_data;
       adoqAddBludo.Parameters.ParamByName('i_b').Value := integer(lbNameBludo.Items.Objects[index]);
       adoqAddBludo.Parameters.ParamByName('m_p').Value := fMainCash.cobMonth.Text + ' ' + fMainCash.spGod.Text;
+
       adoqAddBludo.ExecSQL;
     end;
 
@@ -293,10 +305,13 @@ begin
       with dmCash do
         begin
           adoqAddBludo.SQL.Clear;
+
           adoqAddBludo.SQL.Append('INSERT INTO spisok_pokup');
           adoqAddBludo.SQL.Append('(name_pokup)');
           adoqAddBludo.SQL.Append('VALUES (:n_p)');
+
           adoqAddBludo.Parameters.ParamByName('n_p').Value := clbSpisokProd.Items[clbSpisokProd.ItemIndex];
+          
           adoqAddBludo.ExecSQL;
         end;
 end;

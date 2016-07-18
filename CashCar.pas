@@ -87,8 +87,10 @@ begin
   with dmCash do
     begin
       adoqCarExpen.SQL.Clear;
+
       adoqCarExpen.SQL.Append('SELECT * FROM car_expen');
-      adoqCarExpen.SQL.Append('ORDER BY date_rep');
+      adoqCarExpen.SQL.Append('ORDER BY date_rep, replaced ASC');
+
       adoqCarExpen.Open;
     end;
 
@@ -117,8 +119,8 @@ procedure TfCarExpen.FormShow(Sender: TObject);
 begin
   LoadData;
 
-  dbgCar.EvenRowColor := RGB(214,254,252); //цвет фона голубой
-  dbgCar.OddRowColor := RGB(254,254,214);  //цвет фона желтый
+  dbgCar.EvenRowColor := RGB(214, 254, 252); //цвет фона голубой
+  dbgCar.OddRowColor := RGB(254, 254, 214);  //цвет фона желтый
 end;
 
 procedure TfCarExpen.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -146,9 +148,10 @@ begin
   Sheet.Cells[1, 1]:='Заменено';
   Sheet.Cells[1, 2]:='Дата замены';
   Sheet.Cells[1, 3]:='Стоимость';
+  Sheet.Cells[1, 4]:='Общая сумма по датам';
 
   index := 2;
-  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 3]].Select;
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 4]].Select;
   XLApp.Selection.WrapText := true;
   XLApp.Selection.HorizontalAlignment := - 4108;
   XLApp.Selection.Font.Bold := true;
@@ -162,6 +165,9 @@ begin
           Sheet.Cells[index, 1] := adoqCarExpen.FieldByName('replaced').AsString;
           Sheet.Cells[index, 2] := adoqCarExpen.FieldByName('date_rep').AsString;
           Sheet.Cells[index, 3] := adoqCarExpen.FieldByName('cost').AsFloat;
+          Sheet.Cells[index, 4].Formula := '= IF(B' + IntToStr(index) + '<>B' + IntToStr(index - 1) + ',' +
+                                            ' SUMIF(B:B,B' + IntToStr(index)+',C:C),"")';
+
           adoqCarExpen.Next;
           inc(index);
         end;
@@ -174,7 +180,7 @@ begin
   XLApp.Selection.Merge;
   XLApp.Selection.HorizontalAlignment := -4152;
 
-  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[index, 3]].Select;
+  XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[index, 4]].Select;
   XLApp.Selection.Borders.LineStyle := 1;
   XLApp.Selection.Borders.Weight := 2;
   XLApp.Selection.WrapText := true;

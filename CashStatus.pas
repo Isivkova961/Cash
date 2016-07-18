@@ -232,6 +232,7 @@ begin
 
       adoqStatus.SQL.Append('SELECT * FROM status_pokup');
       adoqStatus.SQL.Append(str);
+      adoqStatus.SQL.Append('ORDER BY date_pokup, name_pokup ASC');
 
       adoqStatus.Open;
     end;
@@ -403,7 +404,8 @@ begin
           adoqSpravoch.SQL.Clear;
           adoqSpravoch.SQL.Append('SELECT *');
           adoqSpravoch.SQL.Append('FROM sprav_pokup');
-          adoqSpravoch.SQL.Append('WHERE sprav_pokup.id in ('+iid_prod+')');
+          adoqSpravoch.SQL.Append('WHERE sprav_pokup.id in (' + iid_prod + ')');
+          adoqSpravoch.SQL.Append('ORDER BY id_kat, name_kat ASC');
           adoqSpravoch.Open;
         end;
 

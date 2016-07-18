@@ -2,8 +2,8 @@ object fMainCash: TfMainCash
   Left = 381
   Top = 189
   Width = 1037
-  Height = 680
-  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.4)'
+  Height = 665
+  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.5)'
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -20,9 +20,9 @@ object fMainCash: TfMainCash
   PixelsPerInch = 96
   TextHeight = 17
   object sSpec_Month: TSplitter
-    Left = 241
+    Left = 393
     Top = 27
-    Height = 595
+    Height = 580
     Color = clHighlight
     ParentColor = False
   end
@@ -295,15 +295,15 @@ object fMainCash: TfMainCash
   object pSpec: TPanel
     Left = 0
     Top = 27
-    Width = 241
-    Height = 595
+    Width = 393
+    Height = 580
     Align = alLeft
     Color = clGradientInactiveCaption
     TabOrder = 1
     object lPrognoz: TLabel
       Left = 1
       Top = 1
-      Width = 239
+      Width = 391
       Height = 19
       Align = alTop
       Caption = #1055#1088#1086#1075#1085#1086#1079#1099
@@ -319,8 +319,8 @@ object fMainCash: TfMainCash
     object pcPrognoz: TPageControl
       Left = 1
       Top = 20
-      Width = 239
-      Height = 574
+      Width = 391
+      Height = 559
       ActivePage = tsPrognoz
       Align = alClient
       HotTrack = True
@@ -330,8 +330,8 @@ object fMainCash: TfMainCash
         object vtW: TVirtualStringTree
           Left = 0
           Top = 0
-          Width = 231
-          Height = 542
+          Width = 383
+          Height = 527
           Align = alClient
           ButtonFillMode = fmWindowColor
           Color = clHighlightText
@@ -367,7 +367,7 @@ object fMainCash: TfMainCash
               CaptionAlignment = taCenter
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment]
               Position = 1
-              Width = 87
+              Width = 239
               WideText = #1042#1099#1087#1086#1083#1085#1077#1085#1080#1077
             end>
           WideDefaultText = ''
@@ -379,8 +379,8 @@ object fMainCash: TfMainCash
         object cVirtual: TDBChart
           Left = 0
           Top = 0
-          Width = 230
-          Height = 230
+          Width = 383
+          Height = 241
           AllowPanning = pmNone
           AllowZoom = False
           BackWall.Brush.Color = clWhite
@@ -392,13 +392,13 @@ object fMainCash: TfMainCash
           ClipPoints = False
           Frame.Visible = False
           LeftAxis.Title.Caption = #1047#1072#1075#1086#1083#1086#1074#1086#1082
-          Legend.Alignment = laBottom
           RightAxis.LabelStyle = talText
           View3DOptions.Elevation = 315
           View3DOptions.Orthogonal = False
           View3DOptions.Perspective = 0
           View3DOptions.Rotation = 360
           View3DWalls = False
+          Align = alTop
           Color = clGradientInactiveCaption
           TabOrder = 0
           object Series1: TPieSeries
@@ -416,9 +416,9 @@ object fMainCash: TfMainCash
         end
         object DBChart1: TDBChart
           Left = 0
-          Top = 248
-          Width = 230
-          Height = 230
+          Top = 241
+          Width = 383
+          Height = 280
           AllowPanning = pmNone
           AllowZoom = False
           BackWall.Brush.Color = clWhite
@@ -429,12 +429,13 @@ object fMainCash: TfMainCash
           AxisVisible = False
           ClipPoints = False
           Frame.Visible = False
-          Legend.Alignment = laBottom
+          Legend.LegendStyle = lsValues
           View3DOptions.Elevation = 315
           View3DOptions.Orthogonal = False
           View3DOptions.Perspective = 0
           View3DOptions.Rotation = 360
           View3DWalls = False
+          Align = alTop
           Color = clGradientInactiveCaption
           TabOrder = 1
           object Series2: TPieSeries
@@ -454,16 +455,16 @@ object fMainCash: TfMainCash
     end
   end
   object pDataMonth: TPanel
-    Left = 244
+    Left = 396
     Top = 27
-    Width = 777
-    Height = 595
+    Width = 625
+    Height = 580
     Align = alClient
     TabOrder = 2
     object sMonth_Dat: TSplitter
       Left = 1
-      Top = 402
-      Width = 775
+      Top = 387
+      Width = 623
       Height = 4
       Cursor = crVSplit
       Align = alBottom
@@ -473,7 +474,7 @@ object fMainCash: TfMainCash
     object lData: TLabel
       Left = 1
       Top = 1
-      Width = 775
+      Width = 623
       Height = 19
       Align = alTop
       Caption = #1044#1072#1085#1085#1099#1077
@@ -488,8 +489,8 @@ object fMainCash: TfMainCash
     end
     object pDataDay: TPanel
       Left = 1
-      Top = 406
-      Width = 775
+      Top = 391
+      Width = 623
       Height = 188
       Align = alBottom
       Color = clGradientInactiveCaption
@@ -497,7 +498,7 @@ object fMainCash: TfMainCash
       object lDetail: TLabel
         Left = 1
         Top = 1
-        Width = 773
+        Width = 621
         Height = 19
         Align = alTop
         Caption = #1044#1077#1090#1072#1083#1080#1079#1072#1094#1080#1103
@@ -578,7 +579,7 @@ object fMainCash: TfMainCash
       object pcDetail: TPageControl
         Left = 25
         Top = 20
-        Width = 749
+        Width = 597
         Height = 167
         ActivePage = tsReal
         Align = alClient
@@ -590,7 +591,7 @@ object fMainCash: TfMainCash
           object dbgReal: TDBGridEh
             Left = 0
             Top = 0
-            Width = 741
+            Width = 589
             Height = 135
             Align = alClient
             Color = clWhite
@@ -800,11 +801,11 @@ object fMainCash: TfMainCash
     object sgData: TStringGrid
       Left = 1
       Top = 20
-      Width = 775
-      Height = 382
+      Width = 623
+      Height = 367
       Align = alClient
       Color = clWhite
-      ColCount = 6
+      ColCount = 7
       DefaultDrawing = False
       FixedColor = clGradientActiveCaption
       FixedCols = 0
@@ -821,15 +822,13 @@ object fMainCash: TfMainCash
         115
         107
         103
-        106)
+        106
+        64)
     end
   end
   object mmCash: TMainMenu
     Left = 808
     Top = 432
-    object nFile: TMenuItem
-      Caption = #1060#1072#1081#1083
-    end
     object nViewSpisok: TMenuItem
       Caption = #1055#1088#1086#1089#1084#1086#1090#1088' '#1089#1087#1080#1089#1082#1086#1074
       object nStatus: TMenuItem
@@ -866,6 +865,10 @@ object fMainCash: TfMainCash
       object nOtchetKoshel: TMenuItem
         Caption = #1056#1072#1089#1093#1086#1076#1099' '#1087#1086' '#1082#1086#1096#1077#1083#1100#1082#1072#1084
         OnClick = nOtchetKoshelClick
+      end
+      object nYearR: TMenuItem
+        Caption = #1056#1072#1089#1093#1086#1076#1099' '#1079#1072' '#1075#1086#1076
+        OnClick = nYearRClick
       end
     end
     object nEvent: TMenuItem

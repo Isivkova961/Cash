@@ -1,6 +1,6 @@
 object fBluda: TfBluda
-  Left = 370
-  Top = 371
+  Left = 591
+  Top = 322
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = #1057#1087#1080#1089#1086#1082' '#1073#1083#1102#1076

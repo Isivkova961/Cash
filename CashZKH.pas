@@ -81,6 +81,7 @@ begin
 
           adoqZKH.SQL.Append('SELECT * FROM payment');
           adoqZKH.SQL.Append('WHERE month_v = :m_v');
+          adoqZKH.SQL.Append('ORDER BY date_pay, kateg ASC');
 
           adoqZKH.Parameters.ParamByName('m_v').Value := fMainCash.cobMonth.Text + ' ' + fMainCash.spGod.Text;
 
@@ -91,7 +92,7 @@ begin
     begin
       with dmCash do
         begin
-          adoqZKH.SQL.Text := 'SELECT * FROM payment ORDER BY date_pay ASC';
+          adoqZKH.SQL.Text := 'SELECT * FROM payment ORDER BY date_pay, kateg ASC';
           adoqZKH.Open;
         end;
     end;

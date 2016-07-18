@@ -158,7 +158,7 @@ begin
           Sheet.Cells[index, 3] := adoqZKH.FieldByName('mean_before').AsInteger;
           Sheet.Cells[index, 4] := adoqZKH.FieldByName('mean_new').AsInteger;
           Sheet.Cells[index, 5] := adoqZKH.FieldByName('mean_new').AsInteger - adoqZKH.FieldByName('mean_before').AsInteger;
-          Sheet.Cells[index, 6] := adoqZKH.FieldByName('summa').AsString;
+          Sheet.Cells[index, 6] := adoqZKH.FieldByName('summa').AsFloat;
 
           adoqZKH.Next;
           inc(index);
