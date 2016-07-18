@@ -192,11 +192,8 @@ end;
 //создание дерева
 procedure TfSprav.VivodData;
 var
-  i: Byte;
   node,node1: PVirtualNode;
   Data: PvtWinfo;
-  iid: array of integer;
-  index: integer;
 begin
   vstDohod.Clear;
   vstDohod.BeginUpdate;
@@ -310,7 +307,6 @@ end;
 procedure TfSprav.tbEditClick(Sender: TObject);
 var
   Data: PvtWinfo;
-  node: PVirtualNode;
 begin
   if bDoh_Rosh = true then
     begin
@@ -367,9 +363,8 @@ end;
 procedure TfSprav.DeleteRow;
 var
   Data: PvtWinfo;
-  node: PVirtualNode;
-  i, j, k: integer;
-  del_id, id_sp: string;
+  i: integer;
+  del_id: string;
 begin
   if bDoh_Rosh = true then
     begin

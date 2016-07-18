@@ -49,6 +49,7 @@ type
       const HitInfo: THitInfo);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure EditYN(y_n: boolean);
 
   private
     { Private declarations }

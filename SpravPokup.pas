@@ -92,6 +92,7 @@ begin
 
       adoqDohod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqDohod.SQL.Append('WHERE d_r = true');
+      adoqDohod.SQL.Append('ORDER BY id_kat, name_kat ASC');
 
       adoqDohod.Open;
 
@@ -99,6 +100,7 @@ begin
 
       adoqRashod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqRashod.SQL.Append('WHERE d_r = false');
+      adoqRashod.SQL.Append('ORDER BY id_kat, name_kat ASC');
 
       adoqRashod.Open;
     end;

@@ -91,6 +91,7 @@ begin
       adoqCarExpen.SQL.Append('ORDER BY date_rep');
       adoqCarExpen.Open;
     end;
+
   deDateRep.Text := fMainCash.Date_data;
 end;
 
@@ -100,12 +101,14 @@ begin
     begin
       dbgCar.Options := dbgCar.Options - [dgRowSelect];  //то даем возможность редактировать данные
       dbgCar.Options := dbgCar.Options + [dgEditing];
+
       dbgCar.ReadOnly := false;
     end
   else
     begin
       dbgCar.Options := dbgCar.Options + [dgRowSelect];  //то убираем возможность редактировать данные
       dbgCar.Options := dbgCar.Options - [dgEditing];
+
       dbgCar.ReadOnly := true;
     end;
 end;
@@ -113,6 +116,7 @@ end;
 procedure TfCarExpen.FormShow(Sender: TObject);
 begin
   LoadData;
+
   dbgCar.EvenRowColor := RGB(214,254,252); //цвет фона голубой
   dbgCar.OddRowColor := RGB(254,254,214);  //цвет фона желтый
 end;
@@ -137,13 +141,13 @@ begin
   Colum.Columns[2].ColumnWidth := 11.29;
   Colum.Columns[3].ColumnWidth := 11.29;
 
-  Sheet:=XLApp.Workbooks[1].WorkSheets[1];
+  Sheet := XLApp.Workbooks[1].WorkSheets[1];
   XLApp.Selection.WrapText := true;
   Sheet.Cells[1, 1]:='Заменено';
   Sheet.Cells[1, 2]:='Дата замены';
   Sheet.Cells[1, 3]:='Стоимость';
 
-  index:=2;
+  index := 2;
   XLApp.Range[XLApp.Cells[1, 1], XLApp.Cells[1, 3]].Select;
   XLApp.Selection.WrapText := true;
   XLApp.Selection.HorizontalAlignment := - 4108;
@@ -152,6 +156,7 @@ begin
   with dmCash do
     begin
       adoqCarExpen.First;
+      
       while not (adoqCarExpen.Eof) do
         begin
           Sheet.Cells[index, 1] := adoqCarExpen.FieldByName('replaced').AsString;

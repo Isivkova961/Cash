@@ -181,11 +181,11 @@ begin
                 adoqAddBludo.SQL.Append('SET spisok_prod = :s_p');
                 adoqAddBludo.SQL.Append('WHERE id = :iid');
 
-                adoqAddBludo.Parameters.ParamByName('iid').Value := integer(lbNameBludo.Items.Objects[index]);
-                adoqAddBludo.Parameters.ParamByName('s_p').Value := prod;
-
                 if adoqSpisokBlud.Locate('id', integer(lbNameBludo.Items.Objects[index]), []) then
                   prod := adoqSpisokBlud.FieldByName('spisok_prod').AsString + ',' + eProd.Text;
+
+                adoqAddBludo.Parameters.ParamByName('iid').Value := integer(lbNameBludo.Items.Objects[index]);
+                adoqAddBludo.Parameters.ParamByName('s_p').Value := prod;
 
                 adoqAddBludo.ExecSQL;
 
