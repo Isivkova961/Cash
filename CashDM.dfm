@@ -377,4 +377,16 @@ object dmCash: TdmCash
     Left = 176
     Top = 472
   end
+  object adoqImport: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 328
+    Top = 456
+  end
+  object adoqExport: TADOQuery
+    Connection = adocCash
+    Parameters = <>
+    Left = 376
+    Top = 456
+  end
 end

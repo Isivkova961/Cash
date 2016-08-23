@@ -61,6 +61,8 @@ type
     dsGoal: TDataSource;
     adoqCarExpen: TADOQuery;
     dsCarExpen: TDataSource;
+    adoqImport: TADOQuery;
+    adoqExport: TADOQuery;
     procedure adoqLekarAfterInsert(DataSet: TDataSet);
     procedure adoqStatusAfterInsert(DataSet: TDataSet);
     procedure adoqSpisokAfterInsert(DataSet: TDataSet);

@@ -1,0 +1,260 @@
+unit CashImport;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, StdCtrls, Mask, ToolEdit, ComObj;
+
+type
+  TfCashImport = class(TForm)
+    pButton: TPanel;
+    pData: TPanel;
+    pMessage: TPanel;
+    cebReal: TCheckBox;
+    cebVirtual: TCheckBox;
+    cebSprav: TCheckBox;
+    cebSpisokPokup: TCheckBox;
+    cebLekar: TCheckBox;
+    cebSpisokBlud: TCheckBox;
+    cebStatus: TCheckBox;
+    cebZKH: TCheckBox;
+    cebCar: TCheckBox;
+    lSpisok: TLabel;
+    deRealS: TDateEdit;
+    deRealPo: TDateEdit;
+    deVirtualS: TDateEdit;
+    deVirtualPo: TDateEdit;
+    deSpBlS: TDateEdit;
+    DateEdit6: TDateEdit;
+    deSpBlPo: TDateEdit;
+    deStatusS: TDateEdit;
+    deStatusPo: TDateEdit;
+    bCancel: TButton;
+    bOK: TButton;
+    deCarS: TDateEdit;
+    deCarPo: TDateEdit;
+    cebGoal: TCheckBox;
+    procedure EnableDate;
+    procedure cebRealClick(Sender: TObject);
+    procedure RealClick(bool: boolean; var deDateS, deDatePo: string);
+    procedure bOKClick(Sender: TObject);
+    function CreateAccessDatabase(FileName : String) : String;
+    procedure FormShow(Sender: TObject);
+    procedure NewData;
+    procedure bCancelClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  fCashImport: TfCashImport;
+
+implementation
+
+uses CashDM;
+
+{$R *.dfm}
+
+procedure TfCashImport.EnableDate;
+begin
+  deRealS.Enabled := cebReal.Checked;
+  deRealPo.Enabled := cebReal.Checked;
+
+  deVirtualS.Enabled := cebVirtual.Checked;
+  deVirtualPo.Enabled := cebVirtual.Checked;
+
+  deSpBlS.Enabled := cebSpisokBlud.Checked;
+  deSpBlPo.Enabled := cebSpisokBlud.Checked;
+
+  deStatusS.Enabled := cebStatus.Checked;
+  deStatusPo.Enabled := cebStatus.Checked;
+
+  deCarS.Enabled := cebCar.Checked;
+  deCarPo.Enabled := cebCar.Checked;
+end;
+
+procedure TfCashImport.cebRealClick(Sender: TObject);
+var
+  deDateS, deDatePo: string;
+begin
+  EnableDate;
+
+  if cebReal.Checked then
+    begin
+      RealClick(cebVirtual.Checked, deDateS, deDatePo);
+      deVirtualS.Text := deDateS;
+      deVirtualPo.Text := deDatePo;
+
+      RealClick(cebSpisokBlud.Checked, deDateS, deDatePo);
+      deSpBlS.Text := deDateS;
+      deSpBlPo.Text := deDatePo;
+
+      RealClick(cebStatus.Checked, deDateS, deDatePo);
+      deStatusS.Text := deDateS;
+      deStatusPo.Text := deDatePo;
+
+      RealClick(cebCar.Checked, deDateS, deDatePo);
+      deCarS.Text := deDateS;
+      deCarPo.Text := deDatePo;
+    end
+  else
+    begin
+      RealClick(cebReal.Checked, deDateS, deDatePo);
+      deRealS.Text := deDateS;
+      deRealPo.Text := deDatePo;
+
+      RealClick(cebVirtual.Checked, deDateS, deDatePo);
+      deVirtualS.Text := deDateS;
+      deVirtualPo.Text := deDatePo;
+
+      RealClick(cebSpisokBlud.Checked, deDateS, deDatePo);
+      deSpBlS.Text := deDateS;
+      deSpBlPo.Text := deDatePo;
+
+      RealClick(cebStatus.Checked, deDateS, deDatePo);
+      deStatusS.Text := deDateS;
+      deStatusPo.Text := deDatePo;
+
+      RealClick(cebCar.Checked, deDateS, deDatePo);
+      deCarS.Text := deDateS;
+      deCarPo.Text := deDatePo;
+    end;
+end;
+
+procedure TfCashImport.RealClick(bool: boolean; var deDateS, deDatePo: string);
+begin
+  if bool = true then
+    begin
+      deDateS := deRealS.Text;
+      deDatePo := deRealPo.Text;
+    end
+  else
+    begin
+      deDateS := '';
+      deDatePo := '';
+    end;
+end;
+
+procedure TfCashImport.bOKClick(Sender: TObject);
+  procedure ImportTable(Table, deDateS, deDatePo, pole_date: string);
+  var
+    import_, data_: string;
+  begin
+    import_ := 'import.' + Table;
+    data_ := 'data.' + Table;
+
+    with dmCash do
+      begin
+        adoqImport.SQL.Clear;
+        adoqImport.SQL.Append('SELECT * INTO ' + import_);
+        adoqImport.SQL.Append('FROM ' + data_);
+
+        if (pos(' ', deDateS) = 0) and (pos(' ', deDatePo) = 0) then
+          begin
+            adoqImport.SQL.Append('WHERE ' + pole_date + ' >= :d_s');
+            adoqImport.SQL.Append('and ' + pole_date + ' <= :d_po');
+            adoqImport.Parameters.ParamByName('d_s').Value := deDateS;
+            adoqImport.Parameters.ParamByName('d_po').Value := deDatePo;
+          end;
+
+        adoqImport.ExecSQL;
+      end;
+  end;
+
+begin
+  CreateAccessDatabase('import.mdb');
+  
+  if cebReal.Checked then
+    ImportTable('real_pokup', deRealS.Text, deRealPo.Text, 'date_v');
+
+  if cebVirtual.Checked then
+    ImportTable('virtual_pokup', deVirtualS.Text, deVirtualPo.Text, 'date_v');
+
+  if cebSpisokBlud.Checked then
+    begin
+      ImportTable('spisok_blud', ' ', ' ', '');
+      ImportTable('bludo_pr', deSpBlS.Text, deSpBlPo.Text, 'date_prig');
+    end;
+
+  if cebStatus.Checked then
+    ImportTable('status_pokup', deStatusS.Text, deStatusPo.Text, 'date_pokup');
+
+  if cebCar.Checked then
+    ImportTable('car_expen', deCarS.Text, deCarPo.Text, 'date_pay');
+
+  if cebSpisokPokup.Checked then
+    ImportTable('spisok_pokup', ' ', ' ', '');
+
+  if cebLekar.Checked then
+    ImportTable('spisok_lekar', ' ', ' ', '');
+
+  if cebSprav.Checked then
+    ImportTable('sprav_pokup', ' ', ' ', '');
+
+  if cebZKH.Checked then
+    ImportTable('payMent', ' ', ' ', '');
+
+  if cebGoal.Checked then
+    ImportTable('goal', ' ', ' ', '');
+
+  ShowMessage('Данные испортированы в файл import.mdb');
+  Close;
+end;
+
+function TfCashImport.CreateAccessDatabase(FileName : String) : String;
+var
+  BD : OLEVariant;
+begin
+  result := '';
+  if (FileExists(FileName)) then
+    DeleteFile(FileName);
+
+  try
+    BD := CreateOleObject('ADOX.Catalog');
+    try
+      BD.create('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=' + Filename + ';');
+    finally
+      BD := NULL;
+    end
+  except
+    on e: Exception do result := e.message;
+  end;
+end;
+
+procedure TfCashImport.FormShow(Sender: TObject);
+begin
+  NewData;
+end;
+
+procedure TfCashImport.NewData;
+var
+  i: integer;
+begin
+  for i := 0 to ComponentCount - 1 do
+    begin
+      if (Components[i] is TCheckBox) then
+        (Components[i] as TCheckBox).Checked := false;
+
+      if (Components[i] is TDateEdit) then
+        (Components[i] as TDateEdit).Text := '';
+    end;
+end;
+
+procedure TfCashImport.bCancelClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfCashImport.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 27 then
+    Close;
+end;
+
+end.

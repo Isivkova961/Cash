@@ -16,13 +16,14 @@ uses
   CashZKH in 'CashZKH.pas' {fCashZKH},
   CashNewDate in 'CashNewDate.pas' {fCashNewDate},
   CashGoal in 'CashGoal.pas' {fCashGoal},
-  CashCar in 'CashCar.pas' {fCarExpen};
+  CashCar in 'CashCar.pas' {fCarExpen},
+  CashImport in 'CashImport.pas' {fCashImport};
 
 {$R *.res}
 
 begin
   Application.Initialize;
-  Application.Title := 'Cash 1.4';
+  Application.Title := 'Cash 1.5';
   Application.CreateForm(TfMainCash, fMainCash);
   Application.CreateForm(TfStatus, fStatus);
   Application.CreateForm(TfSprav, fSprav);
@@ -38,5 +39,6 @@ begin
   Application.CreateForm(TfCashNewDate, fCashNewDate);
   Application.CreateForm(TfCashGoal, fCashGoal);
   Application.CreateForm(TfCarExpen, fCarExpen);
+  Application.CreateForm(TfCashImport, fCashImport);
   Application.Run;
 end.

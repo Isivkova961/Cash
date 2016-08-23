@@ -3,7 +3,7 @@ object fMainCash: TfMainCash
   Top = 189
   Width = 1037
   Height = 665
-  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.5)'
+  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.6)'
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -829,6 +829,17 @@ object fMainCash: TfMainCash
   object mmCash: TMainMenu
     Left = 808
     Top = 432
+    object nFile: TMenuItem
+      Caption = #1060#1072#1081#1083
+      object nImportData: TMenuItem
+        Caption = #1054#1073#1085#1086#1074#1080#1090#1100' '#1076#1072#1085#1085#1099#1077
+        OnClick = nImportDataClick
+      end
+      object nExportData: TMenuItem
+        Caption = #1042#1099#1075#1088#1091#1079#1080#1090#1100' '#1076#1072#1085#1085#1099#1077
+        OnClick = nExportDataClick
+      end
+    end
     object nViewSpisok: TMenuItem
       Caption = #1055#1088#1086#1089#1084#1086#1090#1088' '#1089#1087#1080#1089#1082#1086#1074
       object nStatus: TMenuItem
