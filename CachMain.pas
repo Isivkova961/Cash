@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, Menus, ComCtrls, StdCtrls, ToolWin, GridsEh, DBGridEh,
   Spin, ImgList, RXSplit, Gauges, Buttons, VirtualTrees,DateUtils, Grids,
-  DBGrids, ComObj, DB, TeEngine, Series, TeeProcs, Chart, DbChart, ADODB;
+  DBGrids, ComObj, DB, TeEngine, Series, TeeProcs, Chart, DbChart, ADODB,
+  sSkinManager;
 
 type
   TfMainCash = class(TForm)
@@ -70,6 +71,7 @@ type
     nFile: TMenuItem;
     nImportData: TMenuItem;
     nExportData: TMenuItem;
+    skCash: TsSkinManager;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: WideString);

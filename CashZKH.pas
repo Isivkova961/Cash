@@ -25,6 +25,7 @@ type
     procedure nOtchetClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure EditYN(y_n: boolean);
+    procedure LoadRealPokup;
 
   private
     { Private declarations }
@@ -34,6 +35,7 @@ type
 
 var
   fCashZKH: TfCashZKH;
+  bNewEdit: boolean;
 
 implementation
 
@@ -53,6 +55,9 @@ begin
           Edit;
           Post;
 
+          LoadRealPokup;
+          bNewEdit := false;
+
           dbgZKH.SelectedIndex := 0;
         end;
     end;
@@ -68,6 +73,7 @@ begin
 
       dmCash.adoqZKH.Insert;
       dmCash.adoqZKH.FieldByName('month_v').Value := fMainCash.cobMonth.Text + ' ' + fMainCash.spGod.Text;
+      bNewEdit := true;
     end;
 end;
 
@@ -106,6 +112,8 @@ end;
 procedure TfCashZKH.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   EditYN(false);
+  fMainCash.OutData;
+  fMainCash.SummaDate;
 end;
 
 procedure TfCashZKH.FormKeyDown(Sender: TObject; var Key: Word;
@@ -211,6 +219,60 @@ begin
       dbgZKH.Options := dbgZKH.Options - [dgEditing];
 
       dbgZKH.ReadOnly := true;
+    end;
+end;
+
+procedure TfCashZKH.LoadRealPokup;
+var
+  kateg: string;
+  iid: integer;
+begin
+  with dmCash do
+    begin
+      kateg := adoqZKH.FieldByName('kateg').AsString;
+
+      adoqSprav.SQL.Clear;
+
+      adoqSprav.SQL.Append('SELECT * FROM sprav_pokup WHERE d_r = false');
+      adoqSprav.SQL.Append('and id_kat <> null');
+      adoqSprav.SQL.Append('ORDER BY name_kat ASC');
+
+      adoqSprav.Open;
+
+      if adoqSprav.Locate('name_kat', kateg, []) then
+        begin
+
+          adoqDetail.SQL.Clear;
+          if bNewEdit = true then
+            begin
+              adoqDetail.SQL.Append('INSERT INTO real_pokup');
+              adoqDetail.SQL.Append('(month_v,date_v, id_prod, sum_d, koshel, comment, kol)');
+              adoqDetail.SQL.Append('VALUES (:m_v, :d_v, :i_p, :sm, :kos, :com, :kl)');
+            end
+          else
+            begin
+              adoqDetail1.SQL.Text := 'SELECT * FROM real_pokup ORDER BY id DESC';
+              adoqDetail1.Open;
+
+              iid := adoqDetail1.FieldByName('id').AsInteger;
+
+              adoqDetail.SQL.Append('UPDATE real_pokup');
+              adoqDetail.SQL.Append('SET month_v=:m_v, date_v=:d_v, id_prod=:i_p, sum_d=:sm, koshel=:kos, comment=:com, kol = :kl');
+              adoqDetail.SQL.Append('WHERE id=:iid');
+
+              adoqDetail.Parameters.ParamByName('iid').Value := iid;
+            end;
+
+          adoqDetail.Parameters.ParamByName('m_v').Value := fMainCash.cobMonth.Text + ' ' + fMainCash.spGod.Text;
+          adoqDetail.Parameters.ParamByName('d_v').Value := adoqZKH.FieldByName('date_pay').AsString;
+          adoqDetail.Parameters.ParamByName('i_p').Value := adoqSprav.FieldByName('id').Value;
+          adoqDetail.Parameters.ParamByName('sm').Value := - adoqZKH.FieldByName('summa').Value;
+          adoqDetail.Parameters.ParamByName('kos').Value := 'З/п Иры';
+          adoqDetail.Parameters.ParamByName('com').Value := 'Коммунальные услуги';
+          adoqDetail.Parameters.ParamByName('kl').Value := '1';
+
+          adoqDetail.ExecSQL;
+        end;
     end;
 end;
 
