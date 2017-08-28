@@ -1008,6 +1008,7 @@ end;
 procedure TfMainCash.tbNewClick(Sender: TObject);
 begin
   bNew_Edit := true;
+  fCashDetail.AddSQL := '';
   fCashDetail.ShowModal;
   VivodData;
 end;
@@ -1015,6 +1016,7 @@ end;
 procedure TfMainCash.tbEditClick(Sender: TObject);
 begin
   bNew_Edit := false;
+  fCashDetail.AddSQL := '';
   fCashDetail.ShowModal;
   VivodData;
 end;
@@ -1098,6 +1100,7 @@ end;
 procedure TfMainCash.dbgRealDblClick(Sender: TObject);
 begin
   bNew_Edit := false;
+  fCashDetail.AddSQL := '';
   fCashDetail.ShowModal;
   VivodData;  
 end;
@@ -1105,6 +1108,7 @@ end;
 procedure TfMainCash.dbgVirtualDblClick(Sender: TObject);
 begin
   bNew_Edit := false;
+  fCashDetail.AddSQL := '';
   fCashDetail.ShowModal;
   VivodData;
 end;

@@ -15,6 +15,7 @@ object fSpravNE: TfSpravNE
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
@@ -84,6 +85,14 @@ object fSpravNE: TfSpravNE
       Height = 17
       Caption = #1052#1077#1076#1080#1082#1072#1084#1077#1085#1090#1099
       TabOrder = 4
+    end
+    object cebSpPokup: TCheckBox
+      Left = 136
+      Top = 72
+      Width = 129
+      Height = 17
+      Caption = #1057#1087#1080#1089#1086#1082' '#1087#1086#1082#1091#1087#1086#1082
+      TabOrder = 5
     end
   end
   object pSpravNE1: TPanel

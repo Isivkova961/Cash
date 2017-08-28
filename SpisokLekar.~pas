@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, GridsEh, DBGridEh, ExtCtrls, ComObj, Menus, StdCtrls;
+  Dialogs, GridsEh, DBGridEh, ExtCtrls, ComObj, Menus, StdCtrls, Buttons;
 
 type
   TfSpisokLekar = class(TForm)
@@ -15,6 +15,7 @@ type
     cebOpen: TCheckBox;
     mmLekar: TMainMenu;
     nExcel: TMenuItem;
+    sbAddLek: TSpeedButton;
     procedure FormShow(Sender: TObject);
     procedure LoadData(str: string);
     procedure nExcelClick(Sender: TObject);
@@ -26,6 +27,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure EditYN(y_n: boolean);
+    procedure sbAddLekClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -38,7 +40,7 @@ var
 
 implementation
 
-uses CashDM;
+uses CashDM, CashDetail, CachMain;
 
 {$R *.dfm}
 
@@ -221,7 +223,7 @@ begin
     Close;
 end;
 
-procedure TfStatus.EditYN(y_n: boolean);
+procedure TfSpisokLekar.EditYN(y_n: boolean);
 begin
   if y_n = true then
     begin
@@ -237,6 +239,17 @@ begin
 
       dbgLekar.ReadOnly := true;
     end;
+end;
+
+procedure TfSpisokLekar.sbAddLekClick(Sender: TObject);
+begin
+  fMainCash.bNew_Edit := true;
+  fCashDetail.AddSQL := 'and lek = true';
+  fCashDetail.NewDetail;
+  fCashDetail.LoadTable;
+  fCashDetail.ShowModal;
+  LoadData('WHERE f_show = false');
+  fMainCash.VivodData;
 end;
 
 end.

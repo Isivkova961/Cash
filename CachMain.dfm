@@ -3,7 +3,7 @@ object fMainCash: TfMainCash
   Top = 189
   Width = 1037
   Height = 665
-  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.6)'
+  Caption = #1055#1083#1072#1085#1080#1088#1086#1074#1097#1080#1082' '#1073#1102#1076#1078#1077#1090#1072' ('#1074#1077#1088#1089#1080#1103' 1.7)'
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -699,7 +699,7 @@ object fMainCash: TfMainCash
           object dbgVirtual: TDBGridEh
             Left = 0
             Top = 0
-            Width = 741
+            Width = 589
             Height = 135
             Align = alClient
             Color = clWhite

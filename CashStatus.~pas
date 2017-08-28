@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, GridsEh, DBGridEh, ExtCtrls, StdCtrls, Mask, ToolEdit, ComCtrls,
-  VirtualTrees;
+  VirtualTrees, Buttons;
 
 type
   TfStatus = class(TForm)
@@ -22,6 +22,7 @@ type
     dbgStatus: TDBGridEh;
     vsgStatus: TVirtualStringTree;
     sStatus: TSplitter;
+    sbAddSpisok: TSpeedButton;
     procedure FormShow(Sender: TObject);
     procedure LoadTable;
     procedure cobNameChange(Sender: TObject);
@@ -50,6 +51,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure EditYN(y_n: boolean);
+    procedure sbAddSpisokClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -72,7 +74,7 @@ var
 
 implementation
 
-uses CashDM, CachMain;
+uses CashDM, CachMain, CashDetail;
 
 {$R *.dfm}
 
@@ -232,6 +234,7 @@ begin
 
       adoqStatus.SQL.Append('SELECT * FROM status_pokup');
       adoqStatus.SQL.Append(str);
+      adoqStatus.SQL.Append('ORDER BY date_pokup, name_pokup ASC');
 
       adoqStatus.Open;
     end;
@@ -403,7 +406,8 @@ begin
           adoqSpravoch.SQL.Clear;
           adoqSpravoch.SQL.Append('SELECT *');
           adoqSpravoch.SQL.Append('FROM sprav_pokup');
-          adoqSpravoch.SQL.Append('WHERE sprav_pokup.id in ('+iid_prod+')');
+          adoqSpravoch.SQL.Append('WHERE sprav_pokup.id in (' + iid_prod + ')');
+          adoqSpravoch.SQL.Append('ORDER BY id_kat, name_kat ASC');
           adoqSpravoch.Open;
         end;
 
@@ -490,6 +494,17 @@ begin
 
       dbgStatus.ReadOnly := true;
     end;
+end;
+
+procedure TfStatus.sbAddSpisokClick(Sender: TObject);
+begin
+  fMainCash.bNew_Edit := true;
+  fCashDetail.AddSQL := 'and sp_pok = true';
+  fCashDetail.NewDetail;
+  fCashDetail.LoadTable;
+  fCashDetail.ShowModal;
+  LoadData('WHERE f_show = false');
+  fMainCash.VivodData;
 end;
 
 end.

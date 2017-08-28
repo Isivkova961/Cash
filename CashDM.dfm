@@ -152,7 +152,6 @@ object dmCash: TdmCash
     Top = 152
   end
   object adoqLekar: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     AfterInsert = adoqLekarAfterInsert
@@ -168,7 +167,6 @@ object dmCash: TdmCash
     Top = 96
   end
   object adoqItog: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     Parameters = <>
@@ -183,7 +181,6 @@ object dmCash: TdmCash
     Top = 256
   end
   object adoqSpisokBlud: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     Parameters = <>
@@ -198,7 +195,6 @@ object dmCash: TdmCash
     Top = 256
   end
   object adoqBludoPr: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     Parameters = <>
@@ -224,7 +220,6 @@ object dmCash: TdmCash
     Top = 256
   end
   object adoqRealD: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     Parameters = <>
@@ -261,7 +256,6 @@ object dmCash: TdmCash
     Top = 408
   end
   object adoqEvent: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     Parameters = <>
@@ -282,7 +276,6 @@ object dmCash: TdmCash
     Top = 320
   end
   object adoqZKH: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     OnCalcFields = adoqZKHCalcFields
@@ -346,7 +339,6 @@ object dmCash: TdmCash
     Top = 368
   end
   object adoqGoal: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     AfterInsert = adoqGoalAfterInsert
@@ -362,7 +354,6 @@ object dmCash: TdmCash
     Top = 424
   end
   object adoqCarExpen: TADOQuery
-    Active = True
     Connection = adocCash
     CursorType = ctStatic
     OnCalcFields = adoqZKHCalcFields

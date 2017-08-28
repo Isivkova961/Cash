@@ -28,6 +28,15 @@ object fStatus: TfStatus
     Align = alTop
     Color = clGradientActiveCaption
     TabOrder = 0
+    object sbAddSpisok: TSpeedButton
+      Left = 472
+      Top = 16
+      Width = 145
+      Height = 22
+      Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1074' '#1089#1087#1080#1089#1086#1082
+      Flat = True
+      OnClick = sbAddSpisokClick
+    end
     object cebDatePokup: TCheckBox
       Left = 8
       Top = 16
@@ -67,7 +76,7 @@ object fStatus: TfStatus
     object cebOpen: TCheckBox
       Left = 304
       Top = 16
-      Width = 201
+      Width = 161
       Height = 17
       Caption = #1054#1090#1086#1073#1088#1072#1079#1080#1090#1100' '#1089#1082#1088#1099#1090#1099#1077
       TabOrder = 4

@@ -27,6 +27,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure nOtchetClick(Sender: TObject);
     procedure cebDateRepClick(Sender: TObject);
+    procedure LoadRealPokup;
   private
     { Private declarations }
   public
@@ -35,6 +36,7 @@ type
 
 var
   fCarExpen: TfCarExpen;
+  bNewEdit: boolean;
 
 implementation
 
@@ -62,6 +64,9 @@ begin
           begin
             adoqCarExpen.Edit;  //И сохраняем их в таблицу
             adoqCarExpen.Post;
+
+            LoadRealPokup;
+            bNewEdit := false;
           end;
       end;
 
@@ -72,6 +77,7 @@ begin
       with dmCash do
         begin
           adoqCarExpen.Insert;  //и сохраняем их в таблицу
+          bNewEdit := true;
         end;
     end;
 
@@ -126,6 +132,9 @@ end;
 procedure TfCarExpen.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   EditYN(false);
+  
+  fMainCash.OutData;
+  fMainCash.SummaDate;
 end;
 
 procedure TfCarExpen.nOtchetClick(Sender: TObject);
@@ -206,6 +215,69 @@ begin
     begin
       adoqCarExpen.Filter := 'date_rep = ' + QuotedStr(deDateRep.Text);
       adoqCarExpen.Filtered := cebDateRep.Checked;
+    end;
+end;
+
+procedure TfCarExpen.LoadRealPokup;
+var
+  kateg, dYear, dDate: string;
+  iid, dMonth: integer;
+begin
+  with dmCash do
+    begin
+      kateg := 'Запчасти';
+
+      adoqSprav.SQL.Clear;
+
+      adoqSprav.SQL.Append('SELECT * FROM sprav_pokup WHERE d_r = false');
+      adoqSprav.SQL.Append('and id_kat <> null');
+      adoqSprav.SQL.Append('ORDER BY name_kat ASC');
+
+      adoqSprav.Open;
+
+      if adoqSprav.Locate('name_kat', kateg, []) then
+        begin
+
+          adoqDetail.SQL.Clear;
+          if bNewEdit = true then
+            begin
+              adoqDetail.SQL.Append('INSERT INTO real_pokup');
+              adoqDetail.SQL.Append('(month_v,date_v, id_prod, sum_d, koshel, comment, kol)');
+              adoqDetail.SQL.Append('VALUES (:m_v, :d_v, :i_p, :sm, :kos, :com, :kl)');
+            end
+          else
+            begin
+              adoqDetail1.SQL.Text := 'SELECT * FROM real_pokup ORDER BY id DESC';
+              adoqDetail1.Open;
+
+              iid := adoqDetail1.FieldByName('id').AsInteger;
+
+              adoqDetail.SQL.Append('UPDATE real_pokup');
+              adoqDetail.SQL.Append('SET month_v=:m_v, date_v=:d_v, id_prod=:i_p, sum_d=:sm, koshel=:kos, comment=:com, kol = :kl');
+              adoqDetail.SQL.Append('WHERE id=:iid');
+
+              adoqDetail.Parameters.ParamByName('iid').Value := iid;
+            end;
+
+          dDate := adoqCarExpen.FieldByName('date_rep').AsString;
+
+          dYear := copy(dDate, 7, 4);
+          dMonth := StrToInt(copy(dDate, 4, 2));
+
+          dDate := fMainCash.cobMonth.Items[dMonth - 1];
+
+
+          adoqDetail.Parameters.ParamByName('m_v').Value := dDate + ' ' + dYear;
+
+          adoqDetail.Parameters.ParamByName('d_v').Value := adoqCarExpen.FieldByName('date_rep').AsString;
+          adoqDetail.Parameters.ParamByName('i_p').Value := adoqSprav.FieldByName('id').Value;
+          adoqDetail.Parameters.ParamByName('sm').Value := - adoqCarExpen.FieldByName('cost').Value;
+          adoqDetail.Parameters.ParamByName('kos').Value := 'З/п Иры';
+          adoqDetail.Parameters.ParamByName('com').Value := adoqCarExpen.FieldByName('replaced').AsString;
+          adoqDetail.Parameters.ParamByName('kl').Value := '1';
+
+          adoqDetail.ExecSQL;
+        end;
     end;
 end;
 

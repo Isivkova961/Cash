@@ -29,6 +29,15 @@ object fSpisokLekar: TfSpisokLekar
     Align = alTop
     Color = clGradientActiveCaption
     TabOrder = 0
+    object sbAddLek: TSpeedButton
+      Left = 456
+      Top = 8
+      Width = 145
+      Height = 22
+      Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1083#1077#1082#1072#1088#1089#1090#1074#1086
+      Flat = True
+      OnClick = sbAddLekClick
+    end
     object cebOpen: TCheckBox
       Left = 8
       Top = 16
@@ -91,6 +100,7 @@ object fSpisokLekar: TfSpisokLekar
           EditButtons = <>
           FieldName = 'name_lek'
           Footers = <>
+          ReadOnly = False
           Title.Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077
           Width = 138
         end
@@ -98,6 +108,7 @@ object fSpisokLekar: TfSpisokLekar
           EditButtons = <>
           FieldName = 'kol'
           Footers = <>
+          ReadOnly = False
           Title.Caption = #1050#1086#1083'-'#1074#1086
           Width = 54
         end

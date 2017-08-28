@@ -46,6 +46,7 @@ procedure TfSpravNE.FormShow(Sender: TObject);
 begin
   LoadTable;
   NewEditData;
+
   cobKateg.SetFocus;
 end;
 
@@ -54,18 +55,24 @@ begin
   with dmCash do
     begin
       adoqDohod.SQL.Clear;
+
       adoqDohod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqDohod.SQL.Append('WHERE d_r = true');
       adoqDohod.SQL.Append('ORDER BY name_kat ASC');
+
       adoqDohod.Open;
 
       adoqRashod.SQL.Clear;
+
       adoqRashod.SQL.Append('SELECT * FROM sprav_pokup');
       adoqRashod.SQL.Append('WHERE d_r = false');
       adoqRashod.SQL.Append('ORDER BY name_kat ASC');
+
       adoqRashod.Open;
     end;
+
   cobKateg.Clear;
+
   if fSprav.bDoh_Rosh = true then
     begin
       with dmCash.adoqDohod do
@@ -73,6 +80,7 @@ begin
           DisableControls;
           cobKateg.Items.BeginUpdate;
           First;
+
           while not Eof do
             begin
               if fSprav.bNew_Edit = true then
@@ -80,8 +88,10 @@ begin
               else
                 if FieldByName('id').AsInteger <> fSprav.iid_sp then
                   cobKateg.Items.AddObject(FieldByName('name_kat').AsString, Pointer(FieldByName('id').AsInteger));
+
               Next;
             end;
+
           cobKateg.Items.EndUpdate;
           EnableControls;
         end;
@@ -93,6 +103,7 @@ begin
           DisableControls;
           cobKateg.Items.BeginUpdate;
           First;
+
           while not Eof do
             begin
               if fSprav.bNew_Edit = true then
@@ -100,8 +111,10 @@ begin
               else
                 if FieldByName('id').AsInteger <> fSprav.iid_sp then
                   cobKateg.Items.AddObject(FieldByName('name_kat').AsString, Pointer(FieldByName('id').AsInteger));
+
               Next;
             end;
+
           cobKateg.Items.EndUpdate;
           EnableControls;
         end;
@@ -123,15 +136,19 @@ begin
       with dmCash do
         begin
           adoqSpravData.SQL.Clear;
+
           adoqSpravData.SQL.Append('INSERT INTO sprav_pokup (name_kat, id_kat, d_r, lek)');
           adoqSpravData.SQL.Append('VALUES (:n_k, :i_k, :dr, :lk)');
+
           adoqSpravData.Parameters.ParamByName('n_k').Value := eName.Text;
+          adoqSpravData.Parameters.ParamByName('dr').Value := fSprav.bDoh_Rosh;
+          adoqSpravData.Parameters.ParamByName('lk').Value := cebMed.Checked;
+
           if cobKateg.ItemIndex = -1 then
             adoqSpravData.Parameters.ParamByName('i_k').Value := null
           else
             adoqSpravData.Parameters.ParamByName('i_k').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
-          adoqSpravData.Parameters.ParamByName('dr').Value := fSprav.bDoh_Rosh;
-          adoqSpravData.Parameters.ParamByName('lk').Value := cebMed.Checked;
+
           adoqSpravData.ExecSQL;
         end;
     end
@@ -140,19 +157,24 @@ begin
       with dmCash do
         begin
           adoqSpravData.SQL.Clear;
+
           adoqSpravData.SQL.Append('UPDATE sprav_pokup SET name_kat = :n_k, id_kat = :i_k, d_r = :dr, lek = :lk');
           adoqSpravData.SQL.Append('WHERE id = :iid');
+
           adoqSpravData.Parameters.ParamByName('n_k').Value := eName.Text;
+          adoqSpravData.Parameters.ParamByName('dr').Value := fSprav.bDoh_Rosh;
+          adoqSpravData.Parameters.ParamByName('iid').Value := fSprav.iid_sp;
+          adoqSpravData.Parameters.ParamByName('lk').Value := cebMed.Checked;
+
           if cobKateg.ItemIndex = -1 then
             adoqSpravData.Parameters.ParamByName('i_k').Value := null
           else
             adoqSpravData.Parameters.ParamByName('i_k').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
-          adoqSpravData.Parameters.ParamByName('dr').Value := fSprav.bDoh_Rosh;
-          adoqSpravData.Parameters.ParamByName('iid').Value := fSprav.iid_sp;
-          adoqSpravData.Parameters.ParamByName('lk').Value := cebMed.Checked;
+
           adoqSpravData.ExecSQL;
         end;
     end;
+
   Close;
 end;
 
@@ -162,12 +184,15 @@ begin
     begin
       SQL.Clear;
       SQL.Append('SELECT * FROM sprav_pokup');
+
       if fSprav.bDoh_Rosh = true then
         SQL.Append('WHERE d_r = true')
       else
         SQL.Append('WHERE d_r = false');
+
       Open;
     end;
+
   if fSprav.bNew_Edit = true then
     begin
       cobKateg.ItemIndex := - 1;
@@ -180,7 +205,9 @@ begin
         cobKateg.ItemIndex := cobKateg.Items.IndexOf(dmCash.adoqSprav.FieldByName('name_kat').AsString)
       else
         cobKateg.ItemIndex := - 1;
+
       eName.Text := fSprav.name_sp;
+
       if dmCash.adoqSprav.Locate('name_kat', fSprav.name_sp,[]) then
         cebMed.Checked := dmCash.adoqSprav.FieldByName('lek').Value;
     end;
@@ -204,6 +231,7 @@ procedure TfSpravNE.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if key = 13 then
     bSave.Click;
+    
   if Key = 27 then
     Close;
 end;

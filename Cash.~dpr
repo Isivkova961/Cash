@@ -23,7 +23,7 @@ uses
 
 begin
   Application.Initialize;
-  Application.Title := 'Cash 1.5';
+  Application.Title := 'Cash 1.6';
   Application.CreateForm(TfMainCash, fMainCash);
   Application.CreateForm(TfStatus, fStatus);
   Application.CreateForm(TfSprav, fSprav);

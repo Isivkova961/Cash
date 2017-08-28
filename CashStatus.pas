@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, GridsEh, DBGridEh, ExtCtrls, StdCtrls, Mask, ToolEdit, ComCtrls,
-  VirtualTrees;
+  VirtualTrees, Buttons;
 
 type
   TfStatus = class(TForm)
@@ -22,6 +22,7 @@ type
     dbgStatus: TDBGridEh;
     vsgStatus: TVirtualStringTree;
     sStatus: TSplitter;
+    sbAddSpisok: TSpeedButton;
     procedure FormShow(Sender: TObject);
     procedure LoadTable;
     procedure cobNameChange(Sender: TObject);
@@ -50,6 +51,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure EditYN(y_n: boolean);
+    procedure sbAddSpisokClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -72,7 +74,7 @@ var
 
 implementation
 
-uses CashDM, CachMain;
+uses CashDM, CachMain, CashDetail;
 
 {$R *.dfm}
 
@@ -484,6 +486,9 @@ begin
       dbgStatus.Options := dbgStatus.Options + [dgEditing];
 
       dbgStatus.ReadOnly := false;
+      dbgStatus.Columns[0].ReadOnly := true;
+      dbgStatus.Columns[1].ReadOnly := true;
+      dbgStatus.Columns[2].ReadOnly := true;
     end
   else
     begin
@@ -492,6 +497,17 @@ begin
 
       dbgStatus.ReadOnly := true;
     end;
+end;
+
+procedure TfStatus.sbAddSpisokClick(Sender: TObject);
+begin
+  fMainCash.bNew_Edit := true;
+  fCashDetail.AddSQL := 'and sp_pok = true';
+  fCashDetail.NewDetail;
+  fCashDetail.LoadTable;
+  fCashDetail.ShowModal;
+  LoadData('WHERE f_show = false');
+  fMainCash.VivodData;
 end;
 
 end.

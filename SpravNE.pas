@@ -17,6 +17,7 @@ type
     bSave: TButton;
     bCancel: TButton;
     cebMed: TCheckBox;
+    cebSpPokup: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure LoadTable;
     procedure bCancelClick(Sender: TObject);
@@ -27,6 +28,7 @@ type
       Shift: TShiftState);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -38,7 +40,7 @@ var
 
 implementation
 
-uses CashDM, SpravPokup;
+uses CashDM, SpravPokup, CashDetail;
 
 {$R *.dfm}
 
@@ -127,52 +129,37 @@ begin
 end;
 
 procedure TfSpravNE.bSaveClick(Sender: TObject);
-var
-  dr: string;
-  id_:integer;
 begin
-  if fSprav.bNew_Edit = true then
+  with dmCash do
     begin
-      with dmCash do
+      if fSprav.bNew_Edit = true then
         begin
           adoqSpravData.SQL.Clear;
 
-          adoqSpravData.SQL.Append('INSERT INTO sprav_pokup (name_kat, id_kat, d_r, lek)');
-          adoqSpravData.SQL.Append('VALUES (:n_k, :i_k, :dr, :lk)');
-
-          adoqSpravData.Parameters.ParamByName('n_k').Value := eName.Text;
-          adoqSpravData.Parameters.ParamByName('dr').Value := fSprav.bDoh_Rosh;
-          adoqSpravData.Parameters.ParamByName('lk').Value := cebMed.Checked;
-
-          if cobKateg.ItemIndex = -1 then
-            adoqSpravData.Parameters.ParamByName('i_k').Value := null
-          else
-            adoqSpravData.Parameters.ParamByName('i_k').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
-
-          adoqSpravData.ExecSQL;
-        end;
-    end
-  else
-    begin
-      with dmCash do
+          adoqSpravData.SQL.Append('INSERT INTO sprav_pokup (name_kat, id_kat, d_r, lek, sp_pok)');
+          adoqSpravData.SQL.Append('VALUES (:n_k, :i_k, :dr, :lk, :sp_p)');
+        end
+      else
         begin
           adoqSpravData.SQL.Clear;
 
-          adoqSpravData.SQL.Append('UPDATE sprav_pokup SET name_kat = :n_k, id_kat = :i_k, d_r = :dr, lek = :lk');
+          adoqSpravData.SQL.Append('UPDATE sprav_pokup SET name_kat = :n_k, id_kat = :i_k, d_r = :dr, lek = :lk, sp_pok = :sp_p');
           adoqSpravData.SQL.Append('WHERE id = :iid');
 
-          adoqSpravData.Parameters.ParamByName('n_k').Value := eName.Text;
-          adoqSpravData.Parameters.ParamByName('dr').Value := fSprav.bDoh_Rosh;
           adoqSpravData.Parameters.ParamByName('iid').Value := fSprav.iid_sp;
-          adoqSpravData.Parameters.ParamByName('lk').Value := cebMed.Checked;
-
-          if cobKateg.ItemIndex = -1 then
-            adoqSpravData.Parameters.ParamByName('i_k').Value := null
-          else
-            adoqSpravData.Parameters.ParamByName('i_k').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
-
-          adoqSpravData.ExecSQL;
         end;
+
+      adoqSpravData.Parameters.ParamByName('n_k').Value := eName.Text;
+      adoqSpravData.Parameters.ParamByName('dr').Value := fSprav.bDoh_Rosh;
+      adoqSpravData.Parameters.ParamByName('lk').Value := cebMed.Checked;
+      adoqSpravData.Parameters.ParamByName('sp_p').Value := cebSpPokup.Checked;
+
+      if cobKateg.ItemIndex = -1 then
+        adoqSpravData.Parameters.ParamByName('i_k').Value := null
+      else
+        adoqSpravData.Parameters.ParamByName('i_k').Value := integer(cobKateg.Items.Objects[cobKateg.ItemIndex]);
+
+      adoqSpravData.ExecSQL;
     end;
 
   Close;
@@ -209,7 +196,10 @@ begin
       eName.Text := fSprav.name_sp;
 
       if dmCash.adoqSprav.Locate('name_kat', fSprav.name_sp,[]) then
-        cebMed.Checked := dmCash.adoqSprav.FieldByName('lek').Value;
+        begin
+          cebMed.Checked := dmCash.adoqSprav.FieldByName('lek').Value;
+          cebSpPokup.Checked := dmCash.adoqSprav.FieldByName('sp_pok').Value;
+        end;
     end;
 end;
 
@@ -217,6 +207,7 @@ procedure TfSpravNE.cobKategChange(Sender: TObject);
 begin
   dmCash.adoqSprav.Locate('name_kat', cobKateg.Text, []);
   cebMed.Checked := dmCash.adoqSprav.FieldByName('lek').Value;
+  cebSpPokup.Checked := dmCash.adoqSprav.FieldByName('sp_pok').Value;
 end;
 
 procedure TfSpravNE.cobKategKeyDown(Sender: TObject; var Key: Word;
@@ -234,6 +225,11 @@ begin
     
   if Key = 27 then
     Close;
+end;
+
+procedure TfSpravNE.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  fCashDetail.LoadTable;
 end;
 
 end.
