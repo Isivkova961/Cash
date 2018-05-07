@@ -110,9 +110,9 @@ ActiveLang=
 ProjectLang=
 RootDir=C:\Program Files (x86)\Borland\Delphi7\Bin\
 [Version Info]
-IncludeVerInfo=0
+IncludeVerInfo=1
 AutoIncBuild=0
-MajorVer=1
+MajorVer=2
 MinorVer=0
 Release=0
 Build=0
@@ -126,7 +126,7 @@ CodePage=1251
 [Version Info Keys]
 CompanyName=
 FileDescription=
-FileVersion=1.0.0.0
+FileVersion=2.0.0.0
 InternalName=
 LegalCopyright=
 LegalTrademarks=
@@ -135,6 +135,7 @@ ProductName=
 ProductVersion=1.0.0.0
 Comments=
 [Excluded Packages]
+c:\program files (x86)\borland\delphi7\Projects\Bpl\acntd7.bpl=AlphaControls
 c:\program files (x86)\borland\delphi7\Bin\DBWEBXPRT.BPL=Borland Web Wizard Package
 C:\Users\program\Downloads\dsftriald7\skinpackD7.bpl=(untitled)
 C:\Users\program\Downloads\bsftriald7\BSFD7.bpl=(untitled)

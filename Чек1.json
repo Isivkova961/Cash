@@ -1,0 +1,74 @@
+{
+  "document" : {
+    "receipt" : {
+      "nds10" : 2025,
+      "shiftNumber" : 13,
+      "fiscalSign" : 3441244377,
+      "fiscalDriveNumber" : "8716000100001872",
+      "operationType" : 1,
+      "kktRegId" : "0000165588035170",
+      "operator" : "Вениамин Выcотин",
+      "fiscalDocumentNumber" : 5939,
+      "receiptCode" : 3,
+      "ecashTotalSum" : 0,
+      "rawData" : "AwAAAxEEEAA4NzE2MDAwMTAwMDAxODcyDQQUADAwMDAxNjU1ODgwMzUxNzAgICAg+gMMADc4MjU3MDYwODYgIBAEBAAzFwAA9AMEACRB1lo1BAYAMQTNHTjZDgQEAA0AAAASBAQAgwEAAB4EAQAB\/AMCANikIwRFAAYEJQAzNDMwOTQ3IJeThI6Vi4WBIJWrpaEgg46Ql4iXLq2g4C4zNTCjNwQCAIsK\/wMCAAABEwQCAIsKrwQBAAKwBAEA9SMESQAGBCgAKjM2NTc4MTAgj6iiriBaQVRFQ0tZIEdVUyDhoqXiLo+dkiAxLjM1qzcEAgAGJ\/8DAgAAARMEAgAGJ68EAQABsAQCAPQFIwRHAAYEJwAzNDA5MzY4IJaQII\/gLqovrCChqK6iLouAii4yLDUl56XgLjI1MKM3BAIA5gr\/AwIAAAETBAIA5gqvBAEAArAEAQD+IwRHAAYEJgAzMjgzNzMzIIKfkpOYLo2gry6RjYWGjoog4i+vIDIsNSUgMC41qzcEAgASDP8DAgAAARMEAgASDK8EAQACsAQCABkBIwRHAAYEJgAzNjEwNjE3IIqMiiCKrquhLpGFkIKFiy6Ki4CRkS6iL6ogMzIwozcEAgCUKv8DAgAAARMEAgCUKq8EAQACsAQCAN8DIwRFAAYEJQAyMTUxNDQyIIKfkpOYioAgkevgrqog4qKu4C7hqy44JSAxMDCjNwQCAO8K\/wMCAAABEwQCAO8KrwQBAAKwBAEA\/iMEPwAGBB8AMzMwMDU3MyCPoKql4iCPn5KFkI6XioAgNjXlNDDhrDcEAgDzAf8DAgAAARMEAgDzAa8EAQABsAQBAEwjBEkABgQoACozNDQwNTUwIJGIg4CQhZKbIEJPTkQgU1RSLkNPTVAuU0lMVi4xjy43BAIAHCX\/AwIAAAETBAIAHCWvBAEAAbAEAgCpBQcEAgDYpDkEAQAAvwQBAADABAEAAMEEAQAA\/QMQAIKlraigrKitIILrY67iqK0fBAEAAU8EAgDpB04EAgDpCw==",
+      "nds18" : 3049,
+      "userInn" : "7825706086",
+      "totalSum" : 42200,
+      "dateTime" : "2018-04-17T18:47:00",
+      "cashTotalSum" : 42200,
+      "requestNumber" : 387,
+      "taxationType" : 1,
+      "items" : [
+        {
+          "name" : "3430947 ЧУДОХЛЕБ Хлеб ГОРЧИЧ.нар.350г",
+          "price" : 2699,
+          "quantity" : 1,
+          "sum" : 2699
+        },
+        {
+          "name" : "*3657810 Пиво ZATECKY GUS свет.ПЭТ 1.35л",
+          "price" : 9990,
+          "quantity" : 1,
+          "sum" : 9990
+        },
+        {
+          "name" : "3409368 ЦР Пр.к\/м биов.ЛАК.2,5%чер.250г",
+          "price" : 2790,
+          "quantity" : 1,
+          "sum" : 2790
+        },
+        {
+          "name" : "3283733 ВЯТУШ.Нап.СНЕЖОК т\/п 2,5% 0.5л",
+          "price" : 3090,
+          "quantity" : 1,
+          "sum" : 3090
+        },
+        {
+          "name" : "3610617 КМК Колб.СЕРВЕЛ.КЛАСС.в\/к 320г",
+          "price" : 10900,
+          "quantity" : 1,
+          "sum" : 10900
+        },
+        {
+          "name" : "2151442 ВЯТУШКА Сырок твор.сл.8% 100г",
+          "price" : 2799,
+          "quantity" : 1,
+          "sum" : 2799
+        },
+        {
+          "name" : "3300573 Пакет ПЯТЕРОЧКА 65х40см",
+          "price" : 499,
+          "quantity" : 1,
+          "sum" : 499
+        },
+        {
+          "name" : "*3440550 СИГАРЕТЫ BOND STR.COMP.SILV.1П.",
+          "price" : 9500,
+          "quantity" : 1,
+          "sum" : 9500
+        }
+      ]
+    }
+  }
+}

@@ -23,6 +23,7 @@ object dmCash: TdmCash
     Left = 16
   end
   object adoqReal: TADOQuery
+    Active = True
     Connection = adocCash
     CursorType = ctStatic
     Parameters = <>
@@ -37,6 +38,7 @@ object dmCash: TdmCash
     Top = 48
   end
   object adoqVirtual: TADOQuery
+    Active = True
     Connection = adocCash
     CursorType = ctStatic
     Parameters = <>

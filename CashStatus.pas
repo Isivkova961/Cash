@@ -282,6 +282,8 @@ begin
 end;
 
 procedure TfStatus.dbgStatusCellClick(Column: TColumnEh);
+var
+  DayUse: real;
 begin
   if dbgStatus.SelectedIndex = 3 then
     begin
@@ -294,11 +296,29 @@ begin
 
           with dmCash do
             begin
+              //—читаем, сколько дней был использован продукт
+              DayUse := (adoqStatus.FieldByName('date_end').AsDateTime - adoqStatus.FieldByName('date_pokup').AsDateTime + 1);
+
+              //«аписываем эти данные в справочник расходов
+              adoqRashod.SQL.Clear;
+
+              adoqRashod.SQL.Append('UPDATE sprav_pokup SET day_use = :day');
+              adoqRashod.SQL.Append('WHERE id = :iid');
+
+              adoqRashod.Parameters.ParamByName('day').Value := DayUse;
+              adoqRashod.Parameters.ParamByName('iid').Value := adoqStatus.FieldByName('id_prod').Value;
+
+              adoqRashod.ExecSQL;
+
+              //¬ыводим таблицу —писок покупок
               adoqSpisok.SQL.Clear;
+
               adoqSpisok.SQL.Append('SELECT * FROM spisok_pokup');
               adoqSpisok.SQL.Append('ORDER BY name_pokup ASC');
+
               adoqSpisok.Open;
 
+              //ѕровер€ем, если в списке уже есть данный продукт, то мен€ем статус, если нет
               if adoqSpisok.Locate('name_pokup',adoqStatus.FieldByName('name_pokup').AsString,[]) = false then
                 begin
                   adoqSpisok.Insert;

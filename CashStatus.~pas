@@ -486,6 +486,9 @@ begin
       dbgStatus.Options := dbgStatus.Options + [dgEditing];
 
       dbgStatus.ReadOnly := false;
+      dbgStatus.Columns[0].ReadOnly := true;
+      dbgStatus.Columns[1].ReadOnly := true;
+      dbgStatus.Columns[2].ReadOnly := true;
     end
   else
     begin

@@ -7,7 +7,7 @@ uses
   Dialogs, ExtCtrls, Menus, ComCtrls, StdCtrls, ToolWin, GridsEh, DBGridEh,
   Spin, ImgList, RXSplit, Gauges, Buttons, VirtualTrees,DateUtils, Grids,
   DBGrids, ComObj, DB, TeEngine, Series, TeeProcs, Chart, DbChart, ADODB,
-  sSkinManager;
+  sSkinManager, uLkJSON;
 
 type
   TfMainCash = class(TForm)
@@ -71,7 +71,8 @@ type
     nFile: TMenuItem;
     nImportData: TMenuItem;
     nExportData: TMenuItem;
-    skCash: TsSkinManager;
+    nLoadCheck: TMenuItem;
+    odLoadCheck: TOpenDialog;
     procedure vtWGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: WideString);
@@ -133,12 +134,17 @@ type
     procedure nYearRClick(Sender: TObject);
     procedure nExportDataClick(Sender: TObject);
     procedure nImportDataClick(Sender: TObject);
+    procedure nLoadCheckClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure LoadCheckIn;
   private
     { Private declarations }
   public
-    bReal_Virt, bNew_Edit: boolean;
+    bReal_Virt, bNew_Edit, bExit: boolean;
     Date_data: string;
     id_prod: array [1..2] of TStringList;
+    slCheck: TStringList;
+    iIDCheck: integer;
     { Public declarations }
   end;
   
@@ -162,7 +168,7 @@ implementation
 
 uses CashDM, CashDetail, SpravPokup, SpisokPokup, CashStatus, SpisokLekar,
   SpisokBlud, CashEvent, CashZKH, CashNewDate, CashGoal, CashCar,
-  CashImport;
+  CashImport, CashVibor;
 
 {$R *.dfm}
 
@@ -231,6 +237,8 @@ begin
 
   for i := 1 to 2 do
     id_prod[i] := TStringList.Create;
+
+  slCheck := TStringList.Create;
 end;
 
 //создание дерева
@@ -1614,6 +1622,151 @@ begin
         end;
     end;
   ShowMessage('Загрузка таблиц завершена!');
+end;
+
+procedure TfMainCash.nLoadCheckClick(Sender: TObject);
+begin
+  odLoadCheck.InitialDir:=GetCurrentDir;
+  odLoadCheck.Options:=[ofFileMustExist];
+  odLoadCheck.Filter:='Чеки|Чек*.json';
+
+  if odLoadCheck.Execute then
+    begin
+      slCheck.LoadFromFile(odLoadCheck.FileName);
+      LoadCheckIn;
+    end
+  else
+    ShowMessage('Чек не загрузился!');
+end;
+
+procedure TfMainCash.FormDestroy(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 1 to 2 do
+    id_prod[i].Destroy;
+
+  slCheck.Destroy;
+end;
+
+procedure TfMainCash.LoadCheckIn;
+var
+  index, iCountCheck, k, i, j: integer;
+  rSumCheck: real;
+  sDateCheck, sName, str, vJsonStr, sYear, sName1, sName2: string;
+  bFind: boolean;
+  js, xs, xxs,jjs: TlkJSONObject;
+  ws: TlkJSONstring;
+  ljs, lCheck: TlkJSONlist;
+begin
+  with dmCash do
+    begin
+      adoqSprav.SQL.Clear;
+      adoqSprav.SQL.Append('SELECT id, name_kat FROM sprav_pokup');
+      adoqSprav.SQL.Append('WHERE id_kat <> null');
+      adoqSprav.SQL.Append('ORDER BY name_kat ASC');
+      adoqSprav.Open;
+    end;
+    bExit := false;
+
+  //Загрузка чека через JSON
+ // js := TlkJSONStreamed.LoadFromFile(odLoadCheck.FileName) as TlkJsonObject;//Загружаем JSON файл
+ //Добавляем массив чеков
+  lCheck := TlkJSONStreamed.LoadFromFile(odLoadCheck.FileName) as TlkJSONlist;//Загружаем JSON файл
+ { vJsonStr := TlkJSON.GenerateText(js);               //Генерируем из него текст
+  js := TlkJSON.ParseText(vJsonStr) as TlkJSONobject; }//Распарсиваем JSON
+  for j := 0 to lCheck.Count - 1 do
+    begin
+      js := lCheck.Child[j].Field['document'] as TlkJSONobject;   //Заходим в категорию document
+      xs := js.Field['receipt'] as TlkJSONobject;   //Заходим в подкатегорию receipt
+      ws := xs.Field['dateTime'] as TlkJSONstring;  //Из подкатегории receipt выбираем категорию dateTime
+
+      //Загрузка даты
+      str := UTF8toAnsi(ws.Value);
+
+      Delete(str, pos('T', str), Length(str));
+      sYear := copy(str, 1, 4);
+      Delete(str, 1, 5);
+      index := StrToInt(copy(str, 1, 2));
+      sDateCheck := copy(str, 1, 2) + '.' + sYear;
+      Delete(str, 1, 3);
+      sDateCheck := str + '.' + sDateCheck;
+
+      //Загрузка наименований и цен в чеке
+      ljs := xs.Field['items'] as TlkJSONlist;
+      for i := 0 to ljs.Count - 1 do
+        begin
+          //Загрузка наименования
+          sName := VarToStr(ljs.Child[i].Field['name'].Value);
+
+          bFind := false;
+
+          with dmCash do
+            begin
+              adoqSprav.First;
+
+              while not(adoqSprav.Eof) do
+                begin
+                  //Ищем из строки name нужное название в БД
+                  sName1 := AnsiUpperCase(adoqSprav.FieldByName('name_kat').AsString);
+                  sName2 := AnsiUpperCase(sName);
+                  if pos(sName1, sName2) > 0 then
+                    begin
+                      iIDCheck := adoqSprav.FieldByName('id').AsInteger;
+
+                      bFind := true;
+
+                      Break;
+                    end;
+
+                  adoqSprav.Next;
+                end;
+            end;
+          //Если программа не нашла нужное название сама, то открываем окно ввода вручную
+          if bFind = false then
+            begin
+              fCashVibor.lNameCheck.Caption := sName;
+              fCashVibor.ShowModal;
+              if bExit = true then break;
+
+            end;
+
+          //Загрузка количества
+          str := VarToStr(ljs.Child[i].Field['quantity'].Value);
+          if pos(',', str) < 0 then
+            iCountCheck := StrToInt(str)
+          else
+            iCountCheck := 1;
+
+          //Загрузка суммы
+          str := VarToStr(ljs.Child[i].Field['sum'].Value);
+          str := copy(str, 1, Length(str) - 2) + ',' + copy(str, Length(str) - 2, 2);
+          rSumCheck := StrToFloat(str);
+
+          with dmCash do
+            begin
+              adoqDetail.SQL.Clear;
+
+              adoqDetail.SQL.Append('INSERT INTO real_pokup');
+              adoqDetail.SQL.Append('(month_v,date_v, id_prod, sum_d, koshel, comment, kol)');
+              adoqDetail.SQL.Append('VALUES (:m_v, :d_v, :i_p, :sm, :kos, :com, :kl)');
+
+              adoqDetail.Parameters.ParamByName('m_v').Value := cobMonth.Items[index - 1] + ' ' + sYear;
+              adoqDetail.Parameters.ParamByName('d_v').Value := sDateCheck;
+              adoqDetail.Parameters.ParamByName('i_p').Value := iIDCheck;
+              adoqDetail.Parameters.ParamByName('kos').Value := 'З/п Иры';
+              adoqDetail.Parameters.ParamByName('com').Value := 'Загружен из электронного чека';
+              adoqDetail.Parameters.ParamByName('kl').Value := iCountCheck;
+              adoqDetail.Parameters.ParamByName('sm').Value := - rSumCheck;
+
+              adoqDetail.ExecSQL;
+            end;
+        end;
+        if bExit = true then break;
+      end;
+  ShowMessage('Данные чеков добавлены!');
+  OutData;
+  SummaDate;
 end;
 
 end.

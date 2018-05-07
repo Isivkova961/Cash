@@ -1,7 +1,7 @@
 object dmCash: TdmCash
   OldCreateOrder = False
-  Left = 583
-  Top = 451
+  Left = 586
+  Top = 196
   Height = 586
   Width = 480
   object adocCash: TADOConnection
