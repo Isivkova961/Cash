@@ -233,7 +233,7 @@ begin
 
       adoqSprav.SQL.Clear;
 
-      adoqSprav.SQL.Append('SELECT * FROM sprav_pokup WHERE d_r = true');
+      adoqSprav.SQL.Append('SELECT * FROM sprav_pokup WHERE d_r = false');
       adoqSprav.SQL.Append('and id_kat <> null');
       adoqSprav.SQL.Append('ORDER BY name_kat ASC');
 
@@ -266,7 +266,7 @@ begin
           adoqDetail.Parameters.ParamByName('m_v').Value := fMainCash.cobMonth.Text + ' ' + fMainCash.spGod.Text;
           adoqDetail.Parameters.ParamByName('d_v').Value := adoqZKH.FieldByName('date_pay').AsString;
           adoqDetail.Parameters.ParamByName('i_p').Value := adoqSprav.FieldByName('id').Value;
-          adoqDetail.Parameters.ParamByName('sm').Value := adoqSprav.FieldByName('summa').Value;
+          adoqDetail.Parameters.ParamByName('sm').Value := - adoqZKH.FieldByName('summa').Value;
           adoqDetail.Parameters.ParamByName('kos').Value := 'З/п Иры';
           adoqDetail.Parameters.ParamByName('com').Value := 'Коммунальные услуги';
           adoqDetail.Parameters.ParamByName('kl').Value := '1';

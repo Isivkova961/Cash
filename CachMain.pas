@@ -1651,11 +1651,11 @@ end;
 
 procedure TfMainCash.LoadCheckIn;
 var
-  index, iCountCheck, k, i, j: integer;
+  index, iCountCheck, i, j: integer;
   rSumCheck: real;
-  sDateCheck, sName, str, vJsonStr, sYear, sName1, sName2: string;
+  sDateCheck, sName, str, sYear, sName1, sName2, sKomment: string;
   bFind: boolean;
-  js, xs, xxs,jjs: TlkJSONObject;
+  js, xs: TlkJSONObject;
   ws: TlkJSONstring;
   ljs, lCheck: TlkJSONlist;
 begin
@@ -1710,6 +1710,7 @@ begin
                   //Ищем из строки name нужное название в БД
                   sName1 := AnsiUpperCase(adoqSprav.FieldByName('name_kat').AsString);
                   sName2 := AnsiUpperCase(sName);
+                  sKomment := '';
                   if pos(sName1, sName2) > 0 then
                     begin
                       iIDCheck := adoqSprav.FieldByName('id').AsInteger;
@@ -1725,8 +1726,11 @@ begin
           //Если программа не нашла нужное название сама, то открываем окно ввода вручную
           if bFind = false then
             begin
+              sKomment := sName;
+
               fCashVibor.lNameCheck.Caption := sName;
               fCashVibor.ShowModal;
+
               if bExit = true then break;
 
             end;
@@ -1755,7 +1759,12 @@ begin
               adoqDetail.Parameters.ParamByName('d_v').Value := sDateCheck;
               adoqDetail.Parameters.ParamByName('i_p').Value := iIDCheck;
               adoqDetail.Parameters.ParamByName('kos').Value := 'З/п Иры';
-              adoqDetail.Parameters.ParamByName('com').Value := 'Загружен из электронного чека';
+
+              if sKomment = '' then
+                adoqDetail.Parameters.ParamByName('com').Value := 'Загружен из электронного чека'
+              else
+                adoqDetail.Parameters.ParamByName('com').Value := sKomment;
+
               adoqDetail.Parameters.ParamByName('kl').Value := iCountCheck;
               adoqDetail.Parameters.ParamByName('sm').Value := - rSumCheck;
 
